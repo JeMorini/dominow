@@ -2,9 +2,18 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Peer } from "peerjs";
+import {
+  ButtonConnect,
+  ContainerConnect,
+  TitleButtonConnect,
+  ContainerGame,
+  ContainerParts,
+} from "./styles";
+import { PiPlugsConnectedFill } from "react-icons/pi";
+import Parts from "@/components/Parts";
 
 export default function Home({ params }: { params: { peerId: string } }) {
-  const [connectedPeerId, setConnectedPeerId] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState("");
   const peerInstance = useRef<any>(null);
 
@@ -23,6 +32,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
 
       connection.on("data", (data) => {
         console.log("Received message:", data);
+        setIsConnected(true);
       });
     });
 
@@ -44,13 +54,29 @@ export default function Home({ params }: { params: { peerId: string } }) {
     });
   };
 
-  return (
-    <div>
-      <h1>Deck</h1>
-      <p>Your ID: {peerId}</p>
-      <h3>Conectar</h3>
-      <button onClick={connectToPeer}>Connect</button>
-      {connectedPeerId && <p>Connected to: {connectedPeerId}</p>}
-    </div>
+  const parts = [
+    ["1", "6"],
+    ["0", "2"],
+    ["3", "4"],
+    ["5", "5"],
+  ];
+
+  return isConnected ? (
+    <ContainerGame>
+      <img src="/logo_white.png" />
+      <ContainerParts>
+        {parts.map((item, index) => (
+          <Parts key={index} numbers={item} />
+        ))}
+      </ContainerParts>
+    </ContainerGame>
+  ) : (
+    <ContainerConnect>
+      <img src="/logo_white.png" />
+      <ButtonConnect onClick={connectToPeer}>
+        <PiPlugsConnectedFill size={20} color="#fff" />
+        <TitleButtonConnect>Conectar</TitleButtonConnect>
+      </ButtonConnect>
+    </ContainerConnect>
   );
 }
