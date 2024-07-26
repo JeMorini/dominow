@@ -1,95 +1,89 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import React, { useState, useEffect, useRef } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import {
+  Container,
+  ContainerQrCodeLine,
+  ContainerQrCode,
+  TitlePlayer,
+  TitleStatus,
+  TitleVs,
+  SubTitle,
+  ButtonUrl,
+  TitleButtonUrl,
+} from "./styles";
+import { FaCopy } from "react-icons/fa";
+import { Peer } from "peerjs";
 
 export default function Home() {
+  const peerInstance = useRef(null);
+  const [peerId, setPeerId] = useState("");
+  const [url, setUrl] = useState("");
+  const [connectedPeerIds, setConnectedPeerIds] = useState<any>([]);
+
+  useEffect(() => {
+    const myPeer = new Peer();
+
+    myPeer.on("open", (id) => {
+      console.log("My peer ID:", id);
+      setPeerId(id);
+      setUrl(`http://localhost:3000/deck/${id}`);
+    });
+
+    myPeer.on("connection", (connection) => {
+      console.log("Connection established with:", connection.peer);
+      setConnectedPeerIds((prev) => [...prev, connection.peer]);
+
+      connection.on("data", (data) => {
+        console.log(data);
+        const conn = myPeer.connect(`${data}`);
+
+        conn.on("open", () => {
+          conn.send("hi!");
+        });
+      });
+    });
+
+    peerInstance.current = myPeer;
+
+    return () => myPeer.destroy();
+  }, []);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(url);
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <Container>
+      <img src="/logo_white.png" />
+      <SubTitle>Conecte-se ao jogo</SubTitle>
+      <ContainerQrCodeLine>
+        <ContainerQrCode>
+          <TitlePlayer>Jogador 1</TitlePlayer>
+          <TitleStatus>
+            Status: {connectedPeerIds[0] ? `Conectado` : `Desconectado`}
+          </TitleStatus>
+          <QRCodeSVG value={url} />
+          <TitlePlayer>Ou</TitlePlayer>
+          <ButtonUrl onClick={copyToClipboard}>
+            <FaCopy size={20} color="#fff" />
+            <TitleButtonUrl>Copiar URL</TitleButtonUrl>
+          </ButtonUrl>
+        </ContainerQrCode>
+        <TitleVs>Vs</TitleVs>
+        <ContainerQrCode>
+          <TitlePlayer>Jogador 2</TitlePlayer>
+          <TitleStatus>
+            Status: {connectedPeerIds[1] ? `Conectado` : `Desconectado`}
+          </TitleStatus>
+          <QRCodeSVG value={url} />
+          <TitlePlayer>Ou</TitlePlayer>
+          <ButtonUrl onClick={copyToClipboard}>
+            <FaCopy size={20} color="#fff" />
+            <TitleButtonUrl>Copiar URL</TitleButtonUrl>
+          </ButtonUrl>
+        </ContainerQrCode>
+      </ContainerQrCodeLine>
+    </Container>
   );
 }

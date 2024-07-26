@@ -9,16 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "next": "14.2.5",
+    "peerjs": "^1.5.4",
+    "qrcode.react": "^3.1.0",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.5"
+    "react-icons": "^5.2.1",
+    "styled-components": "^6.1.12"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5"
+    "eslint-config-next": "14.2.5",
+    "typescript": "^5"
   }
 }
