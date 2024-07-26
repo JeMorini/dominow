@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Peer } from "peerjs";
 import {
   ButtonConnect,
@@ -15,9 +15,13 @@ import Parts from "@/components/Parts";
 export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState("");
+  const [pairs, setPairs] = useState([]);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const player = searchParams.get("player");
 
   useEffect(() => {
     const myPeer = new Peer();
@@ -30,8 +34,9 @@ export default function Home({ params }: { params: { peerId: string } }) {
     myPeer.on("connection", (connection) => {
       console.log("Connection established with:", connection.peer);
 
-      connection.on("data", (data) => {
+      connection.on("data", (data: any) => {
         console.log("Received message:", data);
+        setPairs(data);
         setIsConnected(true);
       });
     });
@@ -50,7 +55,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const connectToPeer = () => {
     const conn = peerInstance.current.connect(params.peerId);
     conn.on("open", () => {
-      conn.send(peerId);
+      conn.send({ peerId: peerId, player: player });
     });
   };
 
@@ -65,7 +70,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
     <ContainerGame>
       <img src="/logo_white.png" />
       <ContainerParts>
-        {parts.map((item, index) => (
+        {pairs.map((item, index) => (
           <Parts key={index} numbers={item} />
         ))}
       </ContainerParts>

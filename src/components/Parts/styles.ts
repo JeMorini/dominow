@@ -15,6 +15,7 @@ export const Container = styled.div`
   border-radius: 8px;
   padding: 10px;
   margin-left: 16px;
+  cursor: pointer;
 `;
 
 export const Line = styled.div`

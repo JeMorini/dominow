@@ -16,10 +16,11 @@ import { FaCopy } from "react-icons/fa";
 import { Peer } from "peerjs";
 
 export default function Home() {
-  const peerInstance = useRef(null);
+  const peerInstance = useRef<any>(null);
   const [peerId, setPeerId] = useState("");
   const [url, setUrl] = useState("");
-  const [connectedPeerIds, setConnectedPeerIds] = useState<any>([]);
+  const [connectedPeerOne, setConnectedPeerOne] = useState<Object | null>();
+  const [connectedPeerTwo, setConnectedPeerTwo] = useState<Object | null>();
 
   useEffect(() => {
     const myPeer = new Peer();
@@ -32,14 +33,21 @@ export default function Home() {
 
     myPeer.on("connection", (connection) => {
       console.log("Connection established with:", connection.peer);
-      setConnectedPeerIds((prev) => [...prev, connection.peer]);
 
-      connection.on("data", (data) => {
-        console.log(data);
-        const conn = myPeer.connect(`${data}`);
+      connection.on("data", (data: any) => {
+        console.log(data.player);
+        console.log(data.player === "2");
+        const conn = myPeer.connect(`${data.peerId}`);
 
         conn.on("open", () => {
-          conn.send("hi!");
+          if (data.player === "1") {
+            setConnectedPeerOne(data);
+          }
+
+          if (data.player === "2") {
+            setConnectedPeerTwo(data);
+          }
+          conn.send(generateRandomPairs());
         });
       });
     });
@@ -49,8 +57,18 @@ export default function Home() {
     return () => myPeer.destroy();
   }, []);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(url);
+  function generateRandomPairs() {
+    const result = [];
+    for (let i = 0; i < 7; i++) {
+      const firstNumber = Math.floor(Math.random() * 7).toString();
+      const secondNumber = Math.floor(Math.random() * 7).toString();
+      result.push([firstNumber, secondNumber]);
+    }
+    return result;
+  }
+
+  const copyToClipboard = (player: string) => {
+    navigator.clipboard.writeText(url + `?player=${player}`);
   };
 
   return (
@@ -61,11 +79,11 @@ export default function Home() {
         <ContainerQrCode>
           <TitlePlayer>Jogador 1</TitlePlayer>
           <TitleStatus>
-            Status: {connectedPeerIds[0] ? `Conectado` : `Desconectado`}
+            Status: {connectedPeerOne ? `Conectado` : `Desconectado`}
           </TitleStatus>
-          <QRCodeSVG value={url} />
+          <QRCodeSVG value={url + `?player=1`} />
           <TitlePlayer>Ou</TitlePlayer>
-          <ButtonUrl onClick={copyToClipboard}>
+          <ButtonUrl onClick={() => copyToClipboard("1")}>
             <FaCopy size={20} color="#fff" />
             <TitleButtonUrl>Copiar URL</TitleButtonUrl>
           </ButtonUrl>
@@ -74,11 +92,11 @@ export default function Home() {
         <ContainerQrCode>
           <TitlePlayer>Jogador 2</TitlePlayer>
           <TitleStatus>
-            Status: {connectedPeerIds[1] ? `Conectado` : `Desconectado`}
+            Status: {connectedPeerTwo ? `Conectado` : `Desconectado`}
           </TitleStatus>
-          <QRCodeSVG value={url} />
+          <QRCodeSVG value={url + `?player=2`} />
           <TitlePlayer>Ou</TitlePlayer>
-          <ButtonUrl onClick={copyToClipboard}>
+          <ButtonUrl onClick={() => copyToClipboard("2")}>
             <FaCopy size={20} color="#fff" />
             <TitleButtonUrl>Copiar URL</TitleButtonUrl>
           </ButtonUrl>
