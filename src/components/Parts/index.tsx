@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
 import { Circle, Container, ContainerNumber, Line } from "./styles";
 
 export default function Parts({ numbers }: { numbers: Array<string> }) {

@@ -8,8 +8,6 @@ export const Container = styled.div`
   flex-direction: column;
   height: 100vh;
   background: #2e4068;
-  margin: 0;
-  padding: 0;
 `;
 
 export const ContainerQrCodeLine = styled.div`
@@ -66,4 +64,14 @@ export const TitleButtonUrl = styled.div`
   font-size: 16px;
   font-weight: 500;
   margin-left: 8px;
+`;
+
+export const ContainerGame = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100vh;
+  background: #2e4068;
 `;

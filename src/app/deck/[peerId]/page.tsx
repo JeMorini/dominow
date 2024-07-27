@@ -16,6 +16,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState("");
   const [pairs, setPairs] = useState([]);
+  const [currentPart, setCurrentPart] = useState([]);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
@@ -36,15 +37,18 @@ export default function Home({ params }: { params: { peerId: string } }) {
 
       connection.on("data", (data: any) => {
         console.log("Received message:", data);
-        setPairs(data);
+        switch (data.type) {
+          case "parts":
+            setPairs(data.data);
+            break;
+          case "currentPart":
+            setCurrentPart(data.data);
+            alert(data.data);
+            break;
+          default:
+        }
         setIsConnected(true);
       });
-    });
-
-    const conn = myPeer.connect(params.peerId);
-
-    conn.on("open", () => {
-      conn.send("hi!");
     });
 
     peerInstance.current = myPeer;
@@ -52,33 +56,44 @@ export default function Home({ params }: { params: { peerId: string } }) {
     return () => myPeer.destroy();
   }, [router, params]);
 
-  const connectToPeer = () => {
+  const sendMessageToPeer = (data: any) => {
     const conn = peerInstance.current.connect(params.peerId);
+
     conn.on("open", () => {
-      conn.send({ peerId: peerId, player: player });
+      conn.send(data);
     });
   };
 
-  const parts = [
-    ["1", "6"],
-    ["0", "2"],
-    ["3", "4"],
-    ["5", "5"],
-  ];
+  const handleSendPart = (data: Array<string>) => {
+    const set1 = new Set(currentPart);
+
+    const hasCommonString = data.some((item: any) => set1.has(item));
+    alert(hasCommonString);
+  };
 
   return isConnected ? (
     <ContainerGame>
       <img src="/logo_white.png" />
       <ContainerParts>
         {pairs.map((item, index) => (
-          <Parts key={index} numbers={item} />
+          <div key={index} onClick={() => handleSendPart(item)}>
+            <Parts numbers={item} />
+          </div>
         ))}
       </ContainerParts>
     </ContainerGame>
   ) : (
     <ContainerConnect>
       <img src="/logo_white.png" />
-      <ButtonConnect onClick={connectToPeer}>
+      <ButtonConnect
+        onClick={() =>
+          sendMessageToPeer({
+            type: "connection",
+            peerId: peerId,
+            player: player,
+          })
+        }
+      >
         <PiPlugsConnectedFill size={20} color="#fff" />
         <TitleButtonConnect>Conectar</TitleButtonConnect>
       </ButtonConnect>
