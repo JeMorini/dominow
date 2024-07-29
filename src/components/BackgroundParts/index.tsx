@@ -2,10 +2,8 @@
 import { useEffect, useState, useRef } from "react";
 import { Container, Logo } from "./styles";
 
-export default function BackgroundParts() {
+export default function BackgroundParts({ color }: any) {
   return (
-    <Container>
-      <Logo src="/logo_white.png" />
-    </Container>
+    <Container color={color}>{/* <Logo src="/logo_white.png" /> */}</Container>
   );
 }

@@ -12,6 +12,8 @@ import {
   ButtonUrl,
   TitleButtonUrl,
   ContainerGame,
+  ScrollableDiv,
+  Table,
 } from "./styles";
 import { FaCopy } from "react-icons/fa";
 import { Peer } from "peerjs";
@@ -27,6 +29,29 @@ export default function Home() {
   const [partsPlayerOne, setPartsPlayerOne] = useState<Object | null>();
   const [partsPlayerTwo, setPartsPlayerTwo] = useState<Object | null>();
   const [currentPart, setCurrentPart] = useState<Array<string> | null>(null);
+  const [allParts, setAllParts] = useState<Object | null>([
+    ["1", "2"],
+    ["2", "3"],
+    ["2", "3"],
+    ["2", "3"],
+    ["2", "3"],
+    ["1", "2"],
+    ["2", "3"],
+    ["2", "3"],
+    ["2", "3"],
+    ["2", "3"],
+  ]);
+
+  const getFirstPart = useCallback(() => {
+    alert(currentPart);
+    if (currentPart) {
+      return currentPart;
+    }
+    const firstNumber = Math.floor(Math.random() * 7).toString();
+    const secondNumber = Math.floor(Math.random() * 7).toString();
+    setCurrentPart([firstNumber, secondNumber]);
+    return [firstNumber, secondNumber];
+  }, [currentPart]);
 
   useEffect(() => {
     const myPeer = new Peer();
@@ -91,22 +116,11 @@ export default function Home() {
     return result;
   };
 
-  const getFirstPart = useCallback(() => {
-    alert(currentPart);
-    if (currentPart) {
-      return currentPart;
-    }
-    const firstNumber = Math.floor(Math.random() * 7).toString();
-    const secondNumber = Math.floor(Math.random() * 7).toString();
-    setCurrentPart([firstNumber, secondNumber]);
-    return [firstNumber, secondNumber];
-  }, [currentPart]);
-
   const copyToClipboard = (player: string) => {
     navigator.clipboard.writeText(url + `?player=${player}`);
   };
 
-  return !connectedPeerOne || !connectedPeerTwo ? (
+  return connectedPeerOne ? (
     <Container>
       <img src="/logo_white.png" />
       <SubTitle>Conecte-se ao jogo</SubTitle>
@@ -140,6 +154,30 @@ export default function Home() {
     </Container>
   ) : (
     <ContainerGame>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <h1>Jogador 1</h1>
+        {Array(7)
+          .fill(7)
+          .map(() => (
+            <BackgroundParts color="red" />
+          ))}
+      </div>
+      <Table>
+        <div
+          style={{
+            zIndex: 10,
+            background: "red",
+            height: "100%",
+            width: 100,
+            borderRadius: 20,
+          }}
+        ></div>
+        <div style={{ marginLeft: 16 }}>
+          <p style={{ fontWeight: "bold" }}>Jogador 1</p>
+          <p>7 peças</p>
+        </div>
+      </Table>
+      {/* {currentPart && <Parts numbers={currentPart} />} */}
       <div
         style={{
           display: "flex",
@@ -149,25 +187,64 @@ export default function Home() {
         }}
       >
         <img src="/logo_white.png" />
-        <p>Jogue</p>
+        <p style={{ fontWeight: "bold", color: "#fff", fontSize: 32 }}>Vez:</p>
+        <div
+          style={{
+            zIndex: 10,
+            background: "green",
+            height: "100%",
+            width: 100,
+            borderRadius: 20,
+          }}
+        ></div>
+        <p style={{ fontWeight: "bold", color: "#fff", fontSize: 32 }}>
+          Jogue:
+        </p>
+        <div
+          style={{
+            zIndex: 10,
+            background: "green",
+            height: "100%",
+            width: 100,
+            borderRadius: 20,
+          }}
+        ></div>
       </div>
+      {/* <div style={{ display: "flex" }}> */}
+      <ScrollableDiv>
+        {allParts &&
+          allParts.map((item, index) => (
+            <Parts
+              key={index}
+              numbers={item}
+              isLast={index === allParts.length - 1}
+            />
+          ))}
+      </ScrollableDiv>
+      {/* </div> */}
       <div style={{ display: "flex", alignItems: "center" }}>
-        <h1>Jogador 1</h1>
         {Array(7)
           .fill(7)
           .map(() => (
-            <BackgroundParts />
+            <BackgroundParts color="green" />
           ))}
       </div>
-      {currentPart && <Parts numbers={currentPart} />}
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <h1>Jogador 2</h1>
-        {Array(7)
-          .fill(7)
-          .map(() => (
-            <BackgroundParts />
-          ))}
-      </div>
+      <Table bottom isSelected>
+        {/* <h1 >Jogador 2</h1> */}
+        <div
+          style={{
+            zIndex: 10,
+            background: "green",
+            height: "100%",
+            width: 100,
+            borderRadius: 20,
+          }}
+        ></div>
+        <div style={{ marginLeft: 16 }}>
+          <p style={{ fontWeight: "bold" }}>Jogador 2</p>
+          <p>7 peças</p>
+        </div>
+      </Table>
     </ContainerGame>
   );
 }

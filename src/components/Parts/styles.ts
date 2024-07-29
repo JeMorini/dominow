@@ -14,8 +14,17 @@ export const Container = styled.div`
   background: #000;
   border-radius: 8px;
   padding: 10px;
-  margin-left: 16px;
+  margin-left: 8px;
   cursor: pointer;
+  transform: rotate(90deg);
+  margin-left: 120px;
+  padding: 24px;
+  z-index: 10;
+  ${({ isLast }) =>
+    isLast &&
+    `border: 2px solid green;
+  box-shadow: 0 0 5px green, 0 0 10px green, 0 0 20px green, 0 0 40px green,
+    0 0 80px green;`}
 `;
 
 export const Line = styled.div`
@@ -26,10 +35,11 @@ export const Line = styled.div`
 `;
 
 export const Circle = styled.div`
-  height: 15px;
-  width: 15px;
+  height: 20px;
+  width: 20px;
   background: #fff;
   border-radius: 50%;
+  box-shadow: inset 5px 0 5px rgba(0, 0, 0, 0.5);
 `;
 
 export const ContainerNumber = styled.div<ContainerNumberProps>`

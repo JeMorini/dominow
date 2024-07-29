@@ -1,7 +1,13 @@
 "use client";
 import { Circle, Container, ContainerNumber, Line } from "./styles";
 
-export default function Parts({ numbers }: { numbers: Array<string> }) {
+export default function Parts({
+  numbers,
+  isLast,
+}: {
+  numbers: Array<string>;
+  isLast: boolean;
+}) {
   const number = (value: string) => {
     switch (value) {
       case "0":
@@ -177,7 +183,7 @@ export default function Parts({ numbers }: { numbers: Array<string> }) {
     }
   };
   return (
-    <Container>
+    <Container isLast={isLast}>
       {number(numbers[0])}
       <Line />
       {number(numbers[1])}
