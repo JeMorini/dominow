@@ -8,6 +8,7 @@ import {
   TitleButtonConnect,
   ContainerGame,
   ContainerParts,
+  ButtonGetPart,
 } from "./styles";
 import { PiPlugsConnectedFill } from "react-icons/pi";
 import Parts from "@/components/Parts";
@@ -43,7 +44,6 @@ export default function Home({ params }: { params: { peerId: string } }) {
             break;
           case "currentPart":
             setCurrentPart(data.data);
-            alert(data.data);
             break;
           default:
         }
@@ -67,13 +67,61 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const handleSendPart = (data: Array<string>) => {
     const set1 = new Set(currentPart);
 
+    // alert(currentPart);
+
     const hasCommonString = data.some((item: any) => set1.has(item));
-    alert(hasCommonString);
+    if (hasCommonString) {
+      sendMessageToPeer({
+        type: "sendPart",
+        newPart: data,
+        peerId: peerId,
+        player: player,
+      });
+      setPairs((prevPairs) => prevPairs.filter((pair) => pair !== data));
+    }
   };
 
   return isConnected ? (
     <ContainerGame>
-      <img src="/logo_white.png" />
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <img src="/logo_white.png" style={{ margin: 0 }} />
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "flex-end",
+            width: "100%",
+            marginBottom: 16,
+          }}
+        >
+          <ButtonGetPart
+            onClick={() => {
+              setPairs((prevParts) => [
+                ...prevParts,
+                [
+                  Math.floor(Math.random() * 7).toString(),
+                  Math.floor(Math.random() * 7).toString(),
+                ],
+              ]);
+              sendMessageToPeer({
+                type: "buyPart",
+                peerId: peerId,
+                player: player,
+              });
+            }}
+          >
+            Comprar peça
+          </ButtonGetPart>
+          <ButtonGetPart>Passar a vez</ButtonGetPart>
+        </div>
+      </div>
       <ContainerParts>
         {pairs.map((item, index) => (
           <div key={index} onClick={() => handleSendPart(item)}>

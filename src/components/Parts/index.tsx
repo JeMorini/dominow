@@ -4,9 +4,11 @@ import { Circle, Container, ContainerNumber, Line } from "./styles";
 export default function Parts({
   numbers,
   isLast,
+  rotation,
 }: {
   numbers: Array<string>;
-  isLast: boolean;
+  isLast?: boolean;
+  rotation?: boolean;
 }) {
   const number = (value: string) => {
     switch (value) {
@@ -26,7 +28,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "flex-start",
                 width: "100%",
-                margin: 16,
               }}
             >
               <Circle />
@@ -36,7 +37,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "flex-end",
                 width: "100%",
-                margin: 16,
               }}
             >
               <Circle />
@@ -51,7 +51,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "flex-start",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -61,7 +60,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "center",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -71,7 +69,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "flex-end",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -86,7 +83,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -97,7 +93,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -113,7 +108,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -124,7 +118,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "center",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -134,7 +127,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -150,7 +142,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -161,7 +152,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -172,7 +162,6 @@ export default function Parts({
                 display: "flex",
                 justifyContent: "space-between",
                 width: "100%",
-                margin: 8,
               }}
             >
               <Circle />
@@ -183,7 +172,7 @@ export default function Parts({
     }
   };
   return (
-    <Container isLast={isLast}>
+    <Container isLast={isLast} rotation={rotation}>
       {number(numbers[0])}
       <Line />
       {number(numbers[1])}

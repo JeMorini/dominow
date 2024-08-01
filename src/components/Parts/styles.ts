@@ -11,20 +11,26 @@ export const Container = styled.div`
   flex-direction: column;
   height: 200px;
   width: 100px;
-  background: #000;
-  border-radius: 8px;
-  padding: 10px;
+  background: #242124;
+  border-radius: 24px;
+  padding: 24px;
   margin-left: 8px;
   cursor: pointer;
-  transform: rotate(90deg);
-  margin-left: 120px;
-  padding: 24px;
   z-index: 10;
   ${({ isLast }) =>
     isLast &&
     `border: 2px solid green;
   box-shadow: 0 0 5px green, 0 0 10px green, 0 0 20px green, 0 0 40px green,
     0 0 80px green;`}
+  ${({ rotation }) =>
+    rotation &&
+    `transform: rotate(90deg);
+  margin-left: 120px;
+  `}
+    @media (max-width: 1000px) {
+    height: 112px;
+    width: 56px;
+  }
 `;
 
 export const Line = styled.div`
@@ -32,14 +38,22 @@ export const Line = styled.div`
   width: 100px;
   background: #fff;
   margin: 16px 0px;
+  @media (max-width: 1000px) {
+    width: 80px;
+  }
 `;
 
 export const Circle = styled.div`
-  height: 20px;
-  width: 20px;
+  height: 16px;
+  width: 16px;
   background: #fff;
   border-radius: 50%;
   box-shadow: inset 5px 0 5px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 1000px) {
+    height: 10px;
+    width: 10px;
+  }
 `;
 
 export const ContainerNumber = styled.div<ContainerNumberProps>`
@@ -49,5 +63,9 @@ export const ContainerNumber = styled.div<ContainerNumberProps>`
   justify-content: ${({ justifyContent }) => justifyContent};
   width: 100%;
   height: 80px;
+  /* background: red; */
   flex-direction: column;
+  @media (max-width: 1000px) {
+    height: 100px;
+  }
 `;

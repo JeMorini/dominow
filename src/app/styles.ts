@@ -75,26 +75,25 @@ export const ContainerGame = styled.div`
   justify-content: space-between;
   flex-direction: column;
   height: 100vh;
-  background: #2e4068;
-  padding: 32px;
+  padding: 32px 0px;
   box-sizing: border-box;
-  /* background-image: radial-gradient(#f1aa41, #b71608, #a30a08); */
+  background-image: radial-gradient(#4c6aae, #2e4068, #26375c);
 `;
 
 export const ScrollableDiv = styled.div`
   width: 100%; /* Defina a largura desejada */
   height: 300px; /* Defina a altura desejada */
-  background: #f0f0f0;
   overflow-x: auto; /* Adiciona o scroll horizontal */
   overflow-y: hidden; /* Esconde o scroll vertical, se necessário */
   white-space: nowrap; /* Impede a quebra de linha para garantir que o conteúdo role horizontalmente */
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: #2e4068;
-  padding: 80px;
+  justify-content: ${({ isScroll }) => (isScroll ? "center" : "flex-end")};
+  background-color: transparent;
+  padding-right: 50%;
   box-sizing: border-box;
-  /* Para navegadores baseados em WebKit (Chrome, Safari) */
+  overflow-x: "auto";
+  white-space: "nowrap";
   ::-webkit-scrollbar {
     display: none;
   }
@@ -136,4 +135,25 @@ export const Table = styled.div`
       : `top: 0;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;`};
+`;
+
+export const Circle = styled.div`
+  height: 16px;
+  width: 16px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: inset 5px 0 5px rgba(0, 0, 0, 0.5);
+`;
+
+export const ContainerNumber = styled.div<ContainerNumberProps>`
+  /* flex: 1; */
+  display: flex;
+  align-items: center;
+  justify-content: ${({ justifyContent }) => justifyContent};
+  width: 80px;
+  height: 80px;
+  background: #242124;
+  padding: 16px;
+  border-radius: 8px;
+  flex-direction: column;
 `;
