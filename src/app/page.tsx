@@ -27,12 +27,14 @@ export default function Home() {
   const scrollableDivRef = useRef(null);
   const [peerId, setPeerId] = useState("");
   const [url, setUrl] = useState("");
-  const [connectedPeerOne, setConnectedPeerOne] = useState<Object | null>();
-  const [connectedPeerTwo, setConnectedPeerTwo] = useState<Object | null>();
+  const [connectedPeerOne, setConnectedPeerOne] = useState<Object | null>(null);
+  const [connectedPeerTwo, setConnectedPeerTwo] = useState<Object | null>(null);
+  const [connectionFinished, setConnectionFinished] = useState<Object | null>();
   const [partsPlayerOne, setPartsPlayerOne] = useState<any>(0);
   const [partsPlayerTwo, setPartsPlayerTwo] = useState<any>(0);
   const [currentPart, setCurrentPart] = useState<Array<string> | null>(null);
-  const [allParts, setAllParts] = useState<Object | null>([["1", "2"]]);
+  const [currentPlayer, setCurrentPlayer] = useState(1);
+  const [allParts, setAllParts] = useState<Object | null>();
 
   const getFirstPart = useCallback(() => {
     if (currentPart) {
@@ -41,10 +43,12 @@ export default function Home() {
     const firstNumber = Math.floor(Math.random() * 7).toString();
     const secondNumber = Math.floor(Math.random() * 7).toString();
     setCurrentPart([firstNumber, secondNumber]);
+    setAllParts([[firstNumber, secondNumber]]);
     return [firstNumber, secondNumber];
   }, [currentPart]);
 
   useEffect(() => {
+    setConnectionFinished(false);
     const myPeer = new Peer();
 
     myPeer.on("open", (id) => {
@@ -82,44 +86,78 @@ export default function Home() {
               },
             });
           }
-          if (data.type === "sendPart") {
-            setAllParts((prevParts) => [...prevParts, data.newPart]);
-            if (data.player === "1") {
-              setPartsPlayerOne((prev) => prev.slice(0, -1));
-            }
-            if (data.player === "2") {
-              setPartsPlayerTwo((prev) => prev.slice(0, -1));
-            }
-            //PARA ADICIONAR
-            // setPartsPlayerOne((prev) => [...prev, 7]);
-            if (scrollableDivRef.current) {
-              setTimeout(() => {
-                scrollableDivRef.current.scrollTo({
-                  left: scrollableDivRef.current.scrollWidth,
-                  behavior: "smooth",
-                });
-              }, 1000);
-            }
-          }
-          if (data.type === "buyPart") {
-            if (data.player === "1") {
-              setPartsPlayerOne((prev) => [...prev, 7]);
-            }
-            if (data.player === "2") {
-              setPartsPlayerTwo((prev) => [...prev, 7]);
-            }
-          }
         });
       });
     });
+
+    setConnectionFinished(true);
 
     peerInstance.current = myPeer;
 
     return () => myPeer.destroy();
   }, []);
 
+  useEffect(() => {
+    if (connectedPeerOne && connectedPeerTwo && connectionFinished) {
+      peerInstance.current.on("connection", (connection) => {
+        console.log("Connection established with:", connection.peer);
+
+        connection.on("data", (data: any) => {
+          const conn = peerInstance.current.connect(`${data.peerId}`);
+
+          conn.on("open", () => {
+            if (data.type === "sendPart") {
+              setCurrentPart(data.newPart);
+              setAllParts((prevParts) => [...prevParts, data.newPart]);
+              if (data.player === "1") {
+                setPartsPlayerOne((prev) => prev.slice(0, -1));
+                sendMessageToPeer({
+                  peerId: connectedPeerTwo?.peerId,
+                  data: {
+                    type: "changeCurrentPlayer",
+                    data: getFirstPart(),
+                  },
+                });
+                setCurrentPlayer(2);
+              }
+              if (data.player === "2") {
+                setPartsPlayerTwo((prev) => prev.slice(0, -1));
+                sendMessageToPeer({
+                  peerId: connectedPeerOne?.peerId,
+                  data: {
+                    type: "changeCurrentPlayer",
+                    data: getFirstPart(),
+                  },
+                });
+                setCurrentPlayer(1);
+              }
+              if (scrollableDivRef.current) {
+                setTimeout(() => {
+                  scrollableDivRef.current.scrollTo({
+                    left: scrollableDivRef.current.scrollWidth,
+                    behavior: "smooth",
+                  });
+                }, 1000);
+              }
+            }
+            if (data.type === "buyPart") {
+              if (data.player === "1") {
+                setPartsPlayerOne((prev) => [...prev, 7]);
+              }
+              if (data.player === "2") {
+                setPartsPlayerTwo((prev) => [...prev, 7]);
+              }
+            }
+          });
+        });
+      });
+
+      return () => peerInstance.current.destroy();
+    }
+  }, [connectedPeerOne, connectedPeerTwo, peerInstance, connectionFinished]);
+
   const sendMessageToPeer = ({ peerId, data }: any) => {
-    const conn = peerInstance.current.connect(`${peerId}`);
+    const conn = peerInstance.current.connect(peerId);
 
     conn.on("open", () => {
       conn.send(data);
@@ -175,11 +213,15 @@ export default function Home() {
   ) : (
     <ContainerGame>
       <div style={{ display: "flex", alignItems: "center" }}>
-        <h1>Jogador 1</h1>
         {partsPlayerOne.length > 1 &&
-          partsPlayerOne.map(() => <BackgroundParts color="red" />)}
+          partsPlayerOne.slice(0, 7).map(() => <BackgroundParts color="red" />)}
+        {partsPlayerOne.length >= 8 && (
+          <p style={{ fontSize: 32, zIndex: 100 }}>
+            + {partsPlayerOne.length - 7}
+          </p>
+        )}
       </div>
-      <Table>
+      <Table isSelected={currentPlayer === 1}>
         <div
           style={{
             zIndex: 10,
@@ -192,6 +234,7 @@ export default function Home() {
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 1</p>
           <p>7 peças</p>
+          <p>{connectedPeerOne?.peerId}</p>
         </div>
       </Table>
       <img
@@ -215,7 +258,7 @@ export default function Home() {
         {partsPlayerTwo.length > 1 &&
           partsPlayerTwo.map(() => <BackgroundParts color="green" />)}
       </div>
-      <Table bottom isSelected>
+      <Table bottom isSelected={currentPlayer === 2}>
         {/* <h1 >Jogador 2</h1> */}
         <div
           style={{
@@ -229,6 +272,7 @@ export default function Home() {
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 2</p>
           <p>7 peças</p>
+          <p>{connectedPeerTwo?.peerId}</p>
         </div>
       </Table>
     </ContainerGame>

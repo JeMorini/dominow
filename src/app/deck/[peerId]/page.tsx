@@ -18,12 +18,19 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [peerId, setPeerId] = useState("");
   const [pairs, setPairs] = useState([]);
   const [currentPart, setCurrentPart] = useState([]);
+  const [currentPlayer, setCurrentPlayer] = useState(false);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const player = searchParams.get("player");
+
+  useEffect(() => {
+    if (player === "1") {
+      setCurrentPlayer(true);
+    }
+  }, [player]);
 
   useEffect(() => {
     const myPeer = new Peer();
@@ -44,6 +51,9 @@ export default function Home({ params }: { params: { peerId: string } }) {
             break;
           case "currentPart":
             setCurrentPart(data.data);
+            break;
+          case "changeCurrentPlayer":
+            setCurrentPlayer(true);
             break;
           default:
         }
@@ -67,17 +77,17 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const handleSendPart = (data: Array<string>) => {
     const set1 = new Set(currentPart);
 
-    // alert(currentPart);
-
     const hasCommonString = data.some((item: any) => set1.has(item));
-    if (hasCommonString) {
+    if (hasCommonString && currentPlayer) {
       sendMessageToPeer({
         type: "sendPart",
         newPart: data,
         peerId: peerId,
         player: player,
       });
+      setCurrentPart(data);
       setPairs((prevPairs) => prevPairs.filter((pair) => pair !== data));
+      setCurrentPlayer(false);
     }
   };
 
@@ -101,20 +111,23 @@ export default function Home({ params }: { params: { peerId: string } }) {
             marginBottom: 16,
           }}
         >
+          <h1>MINHA VEZ {currentPlayer.toString()}</h1>
           <ButtonGetPart
             onClick={() => {
-              setPairs((prevParts) => [
-                ...prevParts,
-                [
-                  Math.floor(Math.random() * 7).toString(),
-                  Math.floor(Math.random() * 7).toString(),
-                ],
-              ]);
-              sendMessageToPeer({
-                type: "buyPart",
-                peerId: peerId,
-                player: player,
-              });
+              if (currentPlayer) {
+                setPairs((prevParts) => [
+                  ...prevParts,
+                  [
+                    Math.floor(Math.random() * 7).toString(),
+                    Math.floor(Math.random() * 7).toString(),
+                  ],
+                ]);
+                sendMessageToPeer({
+                  type: "buyPart",
+                  peerId: peerId,
+                  player: player,
+                });
+              }
             }}
           >
             Comprar peça
