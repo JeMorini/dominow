@@ -32,20 +32,19 @@ export default function Home() {
   const [connectionFinished, setConnectionFinished] = useState<Object | null>();
   const [partsPlayerOne, setPartsPlayerOne] = useState<any>(0);
   const [partsPlayerTwo, setPartsPlayerTwo] = useState<any>(0);
-  const [currentPart, setCurrentPart] = useState<Array<string> | null>(null);
+  const [currentNumber, setCurrentNumber] = useState<string | null>("");
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [allParts, setAllParts] = useState<Object | null>();
 
   const getFirstPart = useCallback(() => {
-    if (currentPart) {
-      return currentPart;
+    if (currentNumber) {
+      return currentNumber;
     }
-    const firstNumber = Math.floor(Math.random() * 7).toString();
-    const secondNumber = Math.floor(Math.random() * 7).toString();
-    setCurrentPart([firstNumber, secondNumber]);
-    setAllParts([[firstNumber, secondNumber]]);
-    return [firstNumber, secondNumber];
-  }, [currentPart]);
+    const number = Math.floor(Math.random() * 7).toString();
+    setCurrentNumber(number);
+    setAllParts([[number, number]]);
+    return number;
+  }, [currentNumber]);
 
   useEffect(() => {
     setConnectionFinished(false);
@@ -67,24 +66,11 @@ export default function Home() {
           if (data.type === "connection") {
             if (data.player === "1") {
               setConnectedPeerOne(data);
-              setPartsPlayerOne(Array(7).fill(7));
             }
 
             if (data.player === "2") {
               setConnectedPeerTwo(data);
-              setPartsPlayerTwo(Array(7).fill(7));
             }
-            sendMessageToPeer({
-              peerId: data.peerId,
-              data: { type: "parts", data: generateRandomPairs() },
-            });
-            sendMessageToPeer({
-              peerId: data.peerId,
-              data: {
-                type: "currentPart",
-                data: getFirstPart(),
-              },
-            });
           }
         });
       });
@@ -107,7 +93,7 @@ export default function Home() {
 
           conn.on("open", () => {
             if (data.type === "sendPart") {
-              setCurrentPart(data.newPart);
+              setCurrentNumber(data.newNumber);
               setAllParts((prevParts) => [...prevParts, data.newPart]);
               if (data.player === "1") {
                 setPartsPlayerOne((prev) => prev.slice(0, -1));
@@ -115,7 +101,7 @@ export default function Home() {
                   peerId: connectedPeerTwo?.peerId,
                   data: {
                     type: "changeCurrentPlayer",
-                    data: getFirstPart(),
+                    data: data.newNumber,
                   },
                 });
                 setCurrentPlayer(2);
@@ -126,7 +112,7 @@ export default function Home() {
                   peerId: connectedPeerOne?.peerId,
                   data: {
                     type: "changeCurrentPlayer",
-                    data: getFirstPart(),
+                    data: data.newNumber,
                   },
                 });
                 setCurrentPlayer(1);
@@ -148,6 +134,26 @@ export default function Home() {
                 setPartsPlayerTwo((prev) => [...prev, 7]);
               }
             }
+            if (data.type === "nextPlayer") {
+              if (data.player === "1") {
+                sendMessageToPeer({
+                  peerId: connectedPeerTwo?.peerId,
+                  data: {
+                    type: "changeCurrentPlayer",
+                  },
+                });
+                setCurrentPlayer(2);
+              }
+              if (data.player === "2") {
+                sendMessageToPeer({
+                  peerId: connectedPeerOne?.peerId,
+                  data: {
+                    type: "changeCurrentPlayer",
+                  },
+                });
+                setCurrentPlayer(1);
+              }
+            }
           });
         });
       });
@@ -155,6 +161,47 @@ export default function Home() {
       return () => peerInstance.current.destroy();
     }
   }, [connectedPeerOne, connectedPeerTwo, peerInstance, connectionFinished]);
+
+  useEffect(() => {
+    if (
+      connectedPeerOne &&
+      connectedPeerTwo &&
+      !partsPlayerOne &&
+      !partsPlayerTwo
+    ) {
+      const number = getFirstPart();
+      sendMessageToPeer({
+        peerId: connectedPeerOne.peerId,
+        data: { type: "parts", data: generateRandomPairs() },
+      });
+      sendMessageToPeer({
+        peerId: connectedPeerOne.peerId,
+        data: {
+          type: "currentPart",
+          data: number,
+        },
+      });
+      setPartsPlayerOne(Array(7).fill(7));
+      sendMessageToPeer({
+        peerId: connectedPeerTwo.peerId,
+        data: { type: "parts", data: generateRandomPairs() },
+      });
+      sendMessageToPeer({
+        peerId: connectedPeerTwo.peerId,
+        data: {
+          type: "currentPart",
+          data: number,
+        },
+      });
+      setPartsPlayerTwo(Array(7).fill(7));
+    }
+  }, [
+    connectedPeerOne,
+    connectedPeerTwo,
+    partsPlayerOne,
+    partsPlayerTwo,
+    currentNumber,
+  ]);
 
   const sendMessageToPeer = ({ peerId, data }: any) => {
     const conn = peerInstance.current.connect(peerId);
@@ -178,7 +225,7 @@ export default function Home() {
     navigator.clipboard.writeText(url + `?player=${player}`);
   };
 
-  return !connectedPeerOne ? (
+  return !connectedPeerOne || !connectedPeerTwo ? (
     <Container>
       <img src="/logo_white.png" />
       <SubTitle>Conecte-se ao jogo</SubTitle>
@@ -233,7 +280,7 @@ export default function Home() {
         ></div>
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 1</p>
-          <p>7 peças</p>
+          <p>{partsPlayerOne.length} peças</p>
           <p>{connectedPeerOne?.peerId}</p>
         </div>
       </Table>
@@ -242,17 +289,19 @@ export default function Home() {
         style={{ position: "absolute", left: 8, top: 8 }}
       />
       {/* <div style={{ display: "flex" }}> */}
-      <ScrollableDiv ref={scrollableDivRef} isScroll={allParts.length > 3}>
-        {allParts &&
-          allParts.map((item, index) => (
-            <Parts
-              key={index}
-              numbers={item}
-              isLast={index === allParts.length - 1}
-              rotation
-            />
-          ))}
-      </ScrollableDiv>
+      {allParts && (
+        <ScrollableDiv ref={scrollableDivRef} isScroll={allParts.length > 3}>
+          {allParts &&
+            allParts.map((item, index) => (
+              <Parts
+                key={index}
+                numbers={item}
+                isLast={index === allParts.length - 1}
+                rotation={item[0] !== item[1]}
+              />
+            ))}
+        </ScrollableDiv>
+      )}
       {/* </div> */}
       <div style={{ display: "flex", alignItems: "center" }}>
         {partsPlayerTwo.length > 1 &&
@@ -271,8 +320,7 @@ export default function Home() {
         ></div>
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 2</p>
-          <p>7 peças</p>
-          <p>{connectedPeerTwo?.peerId}</p>
+          <p>{partsPlayerTwo.length} peças</p>
         </div>
       </Table>
     </ContainerGame>

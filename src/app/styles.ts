@@ -117,12 +117,16 @@ export const Table = styled.div`
   display: flex;
   align-items: left;
   padding: 8px;
-  ${({ isSelected }) =>
+  ${({ isSelected, bottom }) =>
     isSelected &&
     `
-    border: 2px solid green;
-  box-shadow: 0 0 5px green, 0 0 10px green, 0 0 20px green, 0 0 40px green,
-    0 0 80px green;
+    border: 2px solid ${bottom ? "green" : "red"};
+  box-shadow: 0 0 5px ${bottom ? "green" : "red"}, 0 0 10px ${
+      bottom ? "green" : "red"
+    }, 0 0 20px ${bottom ? "green" : "red"}, 0 0 40px ${
+      bottom ? "green" : "red"
+    },
+    0 0 80px ${bottom ? "green" : "red"};
   `}
 
   ${({ bottom }) =>

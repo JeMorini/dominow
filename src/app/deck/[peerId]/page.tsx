@@ -17,8 +17,9 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState("");
   const [pairs, setPairs] = useState([]);
-  const [currentPart, setCurrentPart] = useState([]);
+  const [currentPart, setCurrentPart] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState(false);
+  const [isBuyPart, setIsBuyPart] = useState(false);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
@@ -43,6 +44,8 @@ export default function Home({ params }: { params: { peerId: string } }) {
     myPeer.on("connection", (connection) => {
       console.log("Connection established with:", connection.peer);
 
+      setIsBuyPart(false);
+
       connection.on("data", (data: any) => {
         console.log("Received message:", data);
         switch (data.type) {
@@ -54,6 +57,9 @@ export default function Home({ params }: { params: { peerId: string } }) {
             break;
           case "changeCurrentPlayer":
             setCurrentPlayer(true);
+            if (data.data) {
+              setCurrentPart(data.data);
+            }
             break;
           default:
         }
@@ -75,17 +81,20 @@ export default function Home({ params }: { params: { peerId: string } }) {
   };
 
   const handleSendPart = (data: Array<string>) => {
-    const set1 = new Set(currentPart);
-
-    const hasCommonString = data.some((item: any) => set1.has(item));
+    const hasCommonString = data.includes(currentPart);
     if (hasCommonString && currentPlayer) {
       sendMessageToPeer({
         type: "sendPart",
         newPart: data,
+        newNumber: data.find((part) => part !== currentPart) || data[0],
         peerId: peerId,
         player: player,
       });
-      setCurrentPart(data);
+      if (data[0] === data[1]) {
+        setCurrentPart(data[0]);
+      } else {
+        setCurrentPart(data.find((part) => part !== currentPart));
+      }
       setPairs((prevPairs) => prevPairs.filter((pair) => pair !== data));
       setCurrentPlayer(false);
     }
@@ -114,7 +123,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
           <h1>MINHA VEZ {currentPlayer.toString()}</h1>
           <ButtonGetPart
             onClick={() => {
-              if (currentPlayer) {
+              if (currentPlayer && !isBuyPart) {
                 setPairs((prevParts) => [
                   ...prevParts,
                   [
@@ -127,12 +136,24 @@ export default function Home({ params }: { params: { peerId: string } }) {
                   peerId: peerId,
                   player: player,
                 });
+                setIsBuyPart(true);
               }
             }}
           >
             Comprar peça
           </ButtonGetPart>
-          <ButtonGetPart>Passar a vez</ButtonGetPart>
+          <ButtonGetPart
+            onClick={() => {
+              sendMessageToPeer({
+                type: "nextPlayer",
+                peerId: peerId,
+                player: player,
+              });
+              setCurrentPlayer(false);
+            }}
+          >
+            Passar a vez
+          </ButtonGetPart>
         </div>
       </div>
       <ContainerParts>
