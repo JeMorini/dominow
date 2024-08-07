@@ -83,17 +83,24 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const handleSendPart = (data: Array<string>) => {
     const hasCommonString = data.includes(currentPart);
     if (hasCommonString && currentPlayer) {
-      sendMessageToPeer({
-        type: "sendPart",
-        newPart: data,
-        newNumber: data.find((part) => part !== currentPart) || data[0],
-        peerId: peerId,
-        player: player,
-      });
       if (data[0] === data[1]) {
         setCurrentPart(data[0]);
+        sendMessageToPeer({
+          type: "sendPart",
+          newPart: { data: data, type: "0" },
+          newNumber: data.find((part) => part !== currentPart) || data[0],
+          peerId: peerId,
+          player: player,
+        });
       } else {
         setCurrentPart(data.find((part) => part !== currentPart));
+        sendMessageToPeer({
+          type: "sendPart",
+          newPart: { data: data, type: data[1] === currentPart ? "1" : "2" },
+          newNumber: data.find((part) => part !== currentPart) || data[0],
+          peerId: peerId,
+          player: player,
+        });
       }
       setPairs((prevPairs) => prevPairs.filter((pair) => pair !== data));
       setCurrentPlayer(false);

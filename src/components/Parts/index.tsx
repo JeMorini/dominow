@@ -8,7 +8,7 @@ export default function Parts({
 }: {
   numbers: Array<string>;
   isLast?: boolean;
-  rotation?: boolean;
+  rotation?: string;
 }) {
   const number = (value: string) => {
     switch (value) {

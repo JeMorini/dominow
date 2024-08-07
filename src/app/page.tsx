@@ -42,7 +42,7 @@ export default function Home() {
     }
     const number = Math.floor(Math.random() * 7).toString();
     setCurrentNumber(number);
-    setAllParts([[number, number]]);
+    setAllParts([{ data: [number, number], type: "0" }]);
     return number;
   }, [currentNumber]);
 
@@ -281,7 +281,6 @@ export default function Home() {
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 1</p>
           <p>{partsPlayerOne.length} peças</p>
-          <p>{connectedPeerOne?.peerId}</p>
         </div>
       </Table>
       <img
@@ -295,9 +294,9 @@ export default function Home() {
             allParts.map((item, index) => (
               <Parts
                 key={index}
-                numbers={item}
+                numbers={item.data}
                 isLast={index === allParts.length - 1}
-                rotation={item[0] !== item[1]}
+                rotation={item.type}
               />
             ))}
         </ScrollableDiv>

@@ -23,10 +23,18 @@ export const Container = styled.div`
   box-shadow: 0 0 5px green, 0 0 10px green, 0 0 20px green, 0 0 40px green,
     0 0 80px green;`}
   ${({ rotation }) =>
-    rotation &&
-    `transform: rotate(90deg);
-  margin-left: 120px;
-  `}
+    rotation !== undefined &&
+    `transform: ${
+      rotation === "0"
+        ? "none"
+        : rotation === "1"
+        ? "rotate(90deg)"
+        : "rotate(270deg)"
+    };
+    margin-left: ${rotation === "0" ? 80 : 120}px;
+    margin-right: ${rotation === "0" && -40}px;
+
+    `}
     @media (max-width: 1000px) {
     height: 112px;
     width: 56px;
