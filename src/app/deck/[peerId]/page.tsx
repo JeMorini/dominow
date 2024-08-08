@@ -9,9 +9,13 @@ import {
   ContainerGame,
   ContainerParts,
   ButtonGetPart,
+  TextButtonGetPart,
 } from "./styles";
 import { PiPlugsConnectedFill } from "react-icons/pi";
 import Parts from "@/components/Parts";
+import { GiDominoTiles } from "react-icons/gi";
+import { ImNext2 } from "react-icons/im";
+import PlayerIcon from "@/components/PlayerIcon";
 
 export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -44,8 +48,6 @@ export default function Home({ params }: { params: { peerId: string } }) {
     myPeer.on("connection", (connection) => {
       console.log("Connection established with:", connection.peer);
 
-      setIsBuyPart(false);
-
       connection.on("data", (data: any) => {
         console.log("Received message:", data);
         switch (data.type) {
@@ -53,9 +55,11 @@ export default function Home({ params }: { params: { peerId: string } }) {
             setPairs(data.data);
             break;
           case "currentPart":
+            setIsBuyPart(false);
             setCurrentPart(data.data);
             break;
           case "changeCurrentPlayer":
+            setIsBuyPart(false);
             setCurrentPlayer(true);
             if (data.data) {
               setCurrentPart(data.data);
@@ -107,6 +111,10 @@ export default function Home({ params }: { params: { peerId: string } }) {
     }
   };
 
+  useEffect(() => {
+    console.log(isBuyPart);
+  }, [isBuyPart]);
+
   return isConnected ? (
     <ContainerGame>
       <div
@@ -116,7 +124,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
           justifyContent: "space-between",
         }}
       >
-        <img src="/logo_white.png" style={{ margin: 0 }} />
+        <img src="/logo_white.png" style={{}} />
 
         <div
           style={{
@@ -127,8 +135,10 @@ export default function Home({ params }: { params: { peerId: string } }) {
             marginBottom: 16,
           }}
         >
-          <h1>MINHA VEZ {currentPlayer.toString()}</h1>
           <ButtonGetPart
+            isSelected={
+              !isBuyPart && currentPlayer && (player === "1" ? "red" : "green")
+            }
             onClick={() => {
               if (currentPlayer && !isBuyPart) {
                 setPairs((prevParts) => [
@@ -147,9 +157,11 @@ export default function Home({ params }: { params: { peerId: string } }) {
               }
             }}
           >
-            Comprar peça
+            <GiDominoTiles size={20} color="#fff" />
+            <TextButtonGetPart>Comprar peça</TextButtonGetPart>
           </ButtonGetPart>
           <ButtonGetPart
+            isSelected={currentPlayer && (player === "1" ? "red" : "green")}
             onClick={() => {
               sendMessageToPeer({
                 type: "nextPlayer",
@@ -159,14 +171,22 @@ export default function Home({ params }: { params: { peerId: string } }) {
               setCurrentPlayer(false);
             }}
           >
-            Passar a vez
+            <ImNext2 size={20} color="#fff" />
+            <TextButtonGetPart>Passar a vez</TextButtonGetPart>
           </ButtonGetPart>
         </div>
       </div>
       <ContainerParts>
         {pairs.map((item, index) => (
           <div key={index} onClick={() => handleSendPart(item)}>
-            <Parts numbers={item} />
+            <Parts
+              numbers={item}
+              playableColor={
+                item.includes(currentPart) &&
+                currentPlayer &&
+                (player === "1" ? "red" : "green")
+              }
+            />
           </div>
         ))}
       </ContainerParts>

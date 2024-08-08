@@ -36,7 +36,7 @@ export const ContainerGame = styled.div`
   justify-content: center;
   flex-direction: column;
   height: 100vh;
-  background: #2e4068;
+  background-image: radial-gradient(#4c6aae, #2e4068, #26375c);
   margin: 0;
   padding: 8px;
   transform-origin: center;
@@ -44,7 +44,6 @@ export const ContainerGame = styled.div`
 `;
 
 export const ContainerParts = styled.div`
-  flex: 1;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -53,18 +52,7 @@ export const ContainerParts = styled.div`
   white-space: nowrap;
   overflow-x: "auto";
   white-space: "nowrap";
-  /* ::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Para Firefox */
-  /* scrollbar-width: none;
-
-  /* Para IE e Edge */
-  /* -ms-overflow-style: none;
-
-  /* Suporte futuro para esconder barra de rolagem */
-  /* scrollbar-gutter: stable both-edges; */ */ */ */
+  margin-top: 16px;
 `;
 
 export const ButtonGetPart = styled.div`
@@ -76,5 +64,17 @@ export const ButtonGetPart = styled.div`
   padding: 16px;
   border-radius: 8px;
   cursor: pointer;
+  margin-left: 8px;
+  ${({ isSelected }) =>
+    isSelected &&
+    `
+    border: 4px solid ${isSelected};`}
+`;
+
+export const TextButtonGetPart = styled.p`
+  font-size: 16px;
+  color: #fff;
+  margin: 0;
+  font-weight: 500;
   margin-left: 8px;
 `;

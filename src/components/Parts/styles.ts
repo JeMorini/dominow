@@ -19,9 +19,11 @@ export const Container = styled.div`
   z-index: 10;
   ${({ isLast }) =>
     isLast &&
-    `border: 2px solid green;
-  box-shadow: 0 0 5px green, 0 0 10px green, 0 0 20px green, 0 0 40px green,
-    0 0 80px green;`}
+    `
+    z-index: 0;
+    border: 2px solid #e5e619;
+  box-shadow: 0 0 5px #e5e619, 0 0 10px #e5e619, 0 0 20px #e5e619, 0 0 40px #e5e619,
+    0 0 80px #e5e619;`}
   ${({ rotation }) =>
     rotation !== undefined &&
     `transform: ${
@@ -35,6 +37,10 @@ export const Container = styled.div`
     margin-right: ${rotation === "0" && -40}px;
 
     `}
+      ${({ playableColor }) =>
+    playableColor &&
+    `
+    border: 4px solid ${playableColor};`}
     @media (max-width: 1000px) {
     height: 112px;
     width: 56px;

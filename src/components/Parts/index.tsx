@@ -5,10 +5,12 @@ export default function Parts({
   numbers,
   isLast,
   rotation,
+  playableColor,
 }: {
   numbers: Array<string>;
   isLast?: boolean;
   rotation?: string;
+  playableColor?: string | null;
 }) {
   const number = (value: string) => {
     switch (value) {
@@ -172,7 +174,11 @@ export default function Parts({
     }
   };
   return (
-    <Container isLast={isLast} rotation={rotation}>
+    <Container
+      isLast={isLast}
+      rotation={rotation}
+      playableColor={playableColor}
+    >
       {number(numbers[0])}
       <Line />
       {number(numbers[1])}

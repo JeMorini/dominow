@@ -16,11 +16,14 @@ import {
   Table,
   Circle,
   ContainerNumber,
+  TextPlus,
 } from "./styles";
 import { FaCopy } from "react-icons/fa";
 import { Peer } from "peerjs";
 import Parts from "@/components/Parts";
 import BackgroundParts from "@/components/BackgroundParts";
+import PlayerIcon from "@/components/PlayerIcon";
+import WinnerMessage from "@/components/WinnerMessage";
 
 export default function Home() {
   const peerInstance = useRef<any>(null);
@@ -35,6 +38,7 @@ export default function Home() {
   const [currentNumber, setCurrentNumber] = useState<string | null>("");
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [allParts, setAllParts] = useState<Object | null>();
+  const [isWinner, setIsWinner] = useState<string | null>();
 
   const getFirstPart = useCallback(() => {
     if (currentNumber) {
@@ -211,6 +215,15 @@ export default function Home() {
     });
   };
 
+  useEffect(() => {
+    if (partsPlayerOne.length === 0) {
+      setIsWinner("1");
+    }
+    if (partsPlayerTwo.length === 0) {
+      setIsWinner("2");
+    }
+  }, [partsPlayerOne, partsPlayerTwo]);
+
   const generateRandomPairs = () => {
     const result = [];
     for (let i = 0; i < 7; i++) {
@@ -257,27 +270,24 @@ export default function Home() {
         </ContainerQrCode>
       </ContainerQrCodeLine>
     </Container>
+  ) : isWinner ? (
+    <Container>
+      <img src="/logo_white.png" style={{ position: "absolute", top: 32 }} />
+      <WinnerMessage player={isWinner} />
+    </Container>
   ) : (
     <ContainerGame>
       <div style={{ display: "flex", alignItems: "center" }}>
         {partsPlayerOne.length > 1 &&
           partsPlayerOne.slice(0, 7).map(() => <BackgroundParts color="red" />)}
         {partsPlayerOne.length >= 8 && (
-          <p style={{ fontSize: 32, zIndex: 100 }}>
+          <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
             + {partsPlayerOne.length - 7}
-          </p>
+          </TextPlus>
         )}
       </div>
       <Table isSelected={currentPlayer === 1}>
-        <div
-          style={{
-            zIndex: 10,
-            background: "red",
-            height: "100%",
-            width: 100,
-            borderRadius: 20,
-          }}
-        ></div>
+        <PlayerIcon color="red" player="1" />
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 1</p>
           <p>{partsPlayerOne.length} peças</p>
@@ -303,20 +313,20 @@ export default function Home() {
       )}
       {/* </div> */}
       <div style={{ display: "flex", alignItems: "center" }}>
-        {partsPlayerTwo.length > 1 &&
-          partsPlayerTwo.map(() => <BackgroundParts color="green" />)}
+        {partsPlayerOne.length > 1 &&
+          partsPlayerOne
+            .slice(0, 7)
+            .map(() => <BackgroundParts color="green" />)}
+        {partsPlayerOne.length >= 8 && (
+          <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
+            + {partsPlayerOne.length - 7}
+          </TextPlus>
+        )}
       </div>
       <Table bottom isSelected={currentPlayer === 2}>
         {/* <h1 >Jogador 2</h1> */}
-        <div
-          style={{
-            zIndex: 10,
-            background: "green",
-            height: "100%",
-            width: 100,
-            borderRadius: 20,
-          }}
-        ></div>
+        <PlayerIcon color="green" player="2" />
+
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 2</p>
           <p>{partsPlayerTwo.length} peças</p>

@@ -9,6 +9,7 @@ export const Container = styled.div`
   height: 100vh;
   background: #2e4068;
   padding: 32px;
+  box-sizing: border-box;
 `;
 
 export const ContainerQrCodeLine = styled.div`
@@ -81,11 +82,11 @@ export const ContainerGame = styled.div`
 `;
 
 export const ScrollableDiv = styled.div`
-  width: 100%; /* Defina a largura desejada */
-  height: 300px; /* Defina a altura desejada */
-  overflow-x: auto; /* Adiciona o scroll horizontal */
-  overflow-y: hidden; /* Esconde o scroll vertical, se necessário */
-  white-space: nowrap; /* Impede a quebra de linha para garantir que o conteúdo role horizontalmente */
+  width: 100%;
+  height: 400px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: ${({ isScroll }) => (isScroll ? "center" : "flex-end")};
@@ -160,4 +161,10 @@ export const ContainerNumber = styled.div<ContainerNumberProps>`
   padding: 16px;
   border-radius: 8px;
   flex-direction: column;
+`;
+
+export const TextPlus = styled.p`
+  font-size: 64px;
+  margin-left: 16px;
+  font-weight: 500;
 `;
