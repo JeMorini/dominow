@@ -57,7 +57,7 @@ export default function Home() {
     myPeer.on("open", (id) => {
       console.log("My peer ID:", id);
       setPeerId(id);
-      setUrl(`http://localhost:3000/deck/${id}`);
+      setUrl(`${process.env.NEXT_PUBLIC_URL}/deck/${id}`);
     });
 
     myPeer.on("connection", (connection) => {
@@ -218,11 +218,23 @@ export default function Home() {
   useEffect(() => {
     if (partsPlayerOne.length === 0) {
       setIsWinner("1");
+      sendMessageToPeer({
+        peerId: connectedPeerTwo?.peerId,
+        data: {
+          type: "isWinner",
+        },
+      });
     }
     if (partsPlayerTwo.length === 0) {
       setIsWinner("2");
+      sendMessageToPeer({
+        peerId: connectedPeerOne?.peerId,
+        data: {
+          type: "isWinner",
+        },
+      });
     }
-  }, [partsPlayerOne, partsPlayerTwo]);
+  }, [partsPlayerOne, partsPlayerTwo, connectedPeerOne, connectedPeerTwo]);
 
   const generateRandomPairs = () => {
     const result = [];
@@ -273,7 +285,10 @@ export default function Home() {
   ) : isWinner ? (
     <Container>
       <img src="/logo_white.png" style={{ position: "absolute", top: 32 }} />
-      <WinnerMessage player={isWinner} />
+      <WinnerMessage
+        player={isWinner}
+        message={`Jogador ${isWinner} venceu!`}
+      />
     </Container>
   ) : (
     <ContainerGame>
@@ -316,7 +331,7 @@ export default function Home() {
         {partsPlayerOne.length > 1 &&
           partsPlayerOne
             .slice(0, 7)
-            .map(() => <BackgroundParts color="green" />)}
+            .map(() => <BackgroundParts color="orange" />)}
         {partsPlayerOne.length >= 8 && (
           <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
             + {partsPlayerOne.length - 7}
@@ -325,7 +340,7 @@ export default function Home() {
       </div>
       <Table bottom isSelected={currentPlayer === 2}>
         {/* <h1 >Jogador 2</h1> */}
-        <PlayerIcon color="green" player="2" />
+        <PlayerIcon color="orange" player="2" />
 
         <div style={{ marginLeft: 16 }}>
           <p style={{ fontWeight: "bold" }}>Jogador 2</p>

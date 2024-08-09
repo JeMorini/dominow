@@ -121,13 +121,13 @@ export const Table = styled.div`
   ${({ isSelected, bottom }) =>
     isSelected &&
     `
-    border: 2px solid ${bottom ? "green" : "red"};
-  box-shadow: 0 0 5px ${bottom ? "green" : "red"}, 0 0 10px ${
-      bottom ? "green" : "red"
-    }, 0 0 20px ${bottom ? "green" : "red"}, 0 0 40px ${
-      bottom ? "green" : "red"
+    border: 2px solid ${bottom ? "orange" : "red"};
+  box-shadow: 0 0 5px ${bottom ? "orange" : "red"}, 0 0 10px ${
+      bottom ? "orange" : "red"
+    }, 0 0 20px ${bottom ? "orange" : "red"}, 0 0 40px ${
+      bottom ? "orange" : "red"
     },
-    0 0 80px ${bottom ? "green" : "red"};
+    0 0 80px ${bottom ? "orange" : "red"};
   `}
 
   ${({ bottom }) =>

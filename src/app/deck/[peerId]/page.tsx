@@ -16,14 +16,16 @@ import Parts from "@/components/Parts";
 import { GiDominoTiles } from "react-icons/gi";
 import { ImNext2 } from "react-icons/im";
 import PlayerIcon from "@/components/PlayerIcon";
+import WinnerMessage from "@/components/WinnerMessage";
 
 export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState("");
-  const [pairs, setPairs] = useState([]);
+  const [pairs, setPairs] = useState<any>(null);
   const [currentPart, setCurrentPart] = useState("");
   const [currentPlayer, setCurrentPlayer] = useState(false);
   const [isBuyPart, setIsBuyPart] = useState(false);
+  const [isWinner, setIsWinner] = useState<number | string | null>(null);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
@@ -64,6 +66,9 @@ export default function Home({ params }: { params: { peerId: string } }) {
             if (data.data) {
               setCurrentPart(data.data);
             }
+            break;
+          case "isWinner":
+            setIsWinner("0");
             break;
           default:
         }
@@ -112,85 +117,104 @@ export default function Home({ params }: { params: { peerId: string } }) {
   };
 
   useEffect(() => {
-    console.log(isBuyPart);
-  }, [isBuyPart]);
+    if (pairs && pairs.length === 0 && isConnected) {
+      setIsWinner(1);
+    }
+  }, [pairs, isConnected]);
 
   return isConnected ? (
-    <ContainerGame>
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          justifyContent: "space-between",
-        }}
-      >
-        <img src="/logo_white.png" style={{}} />
-
+    isWinner ? (
+      <ContainerGame>
+        <WinnerMessage
+          player={player}
+          message={isWinner === 1 ? `Você venceu!` : "Você perdeu!"}
+        />
+      </ContainerGame>
+    ) : (
+      <ContainerGame>
         <div
           style={{
             display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "flex-end",
             width: "100%",
-            marginBottom: 16,
+            justifyContent: "space-between",
           }}
         >
-          <ButtonGetPart
-            isSelected={
-              !isBuyPart && currentPlayer && (player === "1" ? "red" : "green")
-            }
-            onClick={() => {
-              if (currentPlayer && !isBuyPart) {
-                setPairs((prevParts) => [
-                  ...prevParts,
-                  [
-                    Math.floor(Math.random() * 7).toString(),
-                    Math.floor(Math.random() * 7).toString(),
-                  ],
-                ]);
-                sendMessageToPeer({
-                  type: "buyPart",
-                  peerId: peerId,
-                  player: player,
-                });
-                setIsBuyPart(true);
-              }
+          <img src="/logo_white.png" />
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "flex-end",
+              width: "100%",
+              marginBottom: 16,
             }}
           >
-            <GiDominoTiles size={20} color="#fff" />
-            <TextButtonGetPart>Comprar peça</TextButtonGetPart>
-          </ButtonGetPart>
-          <ButtonGetPart
-            isSelected={currentPlayer && (player === "1" ? "red" : "green")}
-            onClick={() => {
-              sendMessageToPeer({
-                type: "nextPlayer",
-                peerId: peerId,
-                player: player,
-              });
-              setCurrentPlayer(false);
-            }}
-          >
-            <ImNext2 size={20} color="#fff" />
-            <TextButtonGetPart>Passar a vez</TextButtonGetPart>
-          </ButtonGetPart>
-        </div>
-      </div>
-      <ContainerParts>
-        {pairs.map((item, index) => (
-          <div key={index} onClick={() => handleSendPart(item)}>
-            <Parts
-              numbers={item}
-              playableColor={
-                item.includes(currentPart) &&
+            <ButtonGetPart
+              isSelected={
+                !isBuyPart &&
                 currentPlayer &&
-                (player === "1" ? "red" : "green")
+                (player === "1" ? "red" : "orange")
               }
-            />
+              onClick={() => {
+                if (currentPlayer && !isBuyPart) {
+                  setPairs((prevParts) => [
+                    ...prevParts,
+                    [
+                      Math.floor(Math.random() * 7).toString(),
+                      Math.floor(Math.random() * 7).toString(),
+                    ],
+                  ]);
+                  sendMessageToPeer({
+                    type: "buyPart",
+                    peerId: peerId,
+                    player: player,
+                  });
+                  setIsBuyPart(true);
+                }
+              }}
+            >
+              <GiDominoTiles size={20} color="#fff" />
+              <TextButtonGetPart>Comprar peça</TextButtonGetPart>
+            </ButtonGetPart>
+            <ButtonGetPart
+              isSelected={
+                currentPlayer &&
+                isBuyPart &&
+                (player === "1" ? "red" : "orange")
+              }
+              onClick={() => {
+                if (currentPart && isBuyPart) {
+                  sendMessageToPeer({
+                    type: "nextPlayer",
+                    peerId: peerId,
+                    player: player,
+                  });
+                  setCurrentPlayer(false);
+                }
+              }}
+            >
+              <ImNext2 size={20} color="#fff" />
+              <TextButtonGetPart>Passar a vez</TextButtonGetPart>
+            </ButtonGetPart>
           </div>
-        ))}
-      </ContainerParts>
-    </ContainerGame>
+        </div>
+        <ContainerParts>
+          {pairs.map((item, index) => (
+            <div key={index} onClick={() => handleSendPart(item)}>
+              <Parts
+                numbers={item}
+                playableColor={
+                  item.includes(currentPart) &&
+                  currentPlayer &&
+                  (player === "1" ? "red" : "orange")
+                }
+              />
+            </div>
+          ))}
+        </ContainerParts>
+      </ContainerGame>
+    )
   ) : (
     <ContainerConnect>
       <img src="/logo_white.png" />
