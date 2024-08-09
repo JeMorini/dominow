@@ -27,17 +27,17 @@ import WinnerMessage from "@/components/WinnerMessage";
 
 export default function Home() {
   const peerInstance = useRef<any>(null);
-  const scrollableDivRef = useRef(null);
+  const scrollableDivRef = useRef<any>(null);
   const [peerId, setPeerId] = useState("");
   const [url, setUrl] = useState("");
-  const [connectedPeerOne, setConnectedPeerOne] = useState<Object | null>(null);
-  const [connectedPeerTwo, setConnectedPeerTwo] = useState<Object | null>(null);
+  const [connectedPeerOne, setConnectedPeerOne] = useState<any>(null);
+  const [connectedPeerTwo, setConnectedPeerTwo] = useState<any>(null);
   const [connectionFinished, setConnectionFinished] = useState<Object | null>();
   const [partsPlayerOne, setPartsPlayerOne] = useState<any>(0);
   const [partsPlayerTwo, setPartsPlayerTwo] = useState<any>(0);
   const [currentNumber, setCurrentNumber] = useState<string | null>("");
   const [currentPlayer, setCurrentPlayer] = useState(1);
-  const [allParts, setAllParts] = useState<Object | null>();
+  const [allParts, setAllParts] = useState<any>();
   const [isWinner, setIsWinner] = useState<string | null>();
 
   const getFirstPart = useCallback(() => {
@@ -89,7 +89,7 @@ export default function Home() {
 
   useEffect(() => {
     if (connectedPeerOne && connectedPeerTwo && connectionFinished) {
-      peerInstance.current.on("connection", (connection) => {
+      peerInstance.current.on("connection", (connection: any) => {
         console.log("Connection established with:", connection.peer);
 
         connection.on("data", (data: any) => {
@@ -98,9 +98,9 @@ export default function Home() {
           conn.on("open", () => {
             if (data.type === "sendPart") {
               setCurrentNumber(data.newNumber);
-              setAllParts((prevParts) => [...prevParts, data.newPart]);
+              setAllParts((prevParts: any) => [...prevParts, data.newPart]);
               if (data.player === "1") {
-                setPartsPlayerOne((prev) => prev.slice(0, -1));
+                setPartsPlayerOne((prev: any) => prev.slice(0, -1));
                 sendMessageToPeer({
                   peerId: connectedPeerTwo?.peerId,
                   data: {
@@ -111,7 +111,7 @@ export default function Home() {
                 setCurrentPlayer(2);
               }
               if (data.player === "2") {
-                setPartsPlayerTwo((prev) => prev.slice(0, -1));
+                setPartsPlayerTwo((prev: any) => prev.slice(0, -1));
                 sendMessageToPeer({
                   peerId: connectedPeerOne?.peerId,
                   data: {
@@ -132,10 +132,10 @@ export default function Home() {
             }
             if (data.type === "buyPart") {
               if (data.player === "1") {
-                setPartsPlayerOne((prev) => [...prev, 7]);
+                setPartsPlayerOne((prev: any) => [...prev, 7]);
               }
               if (data.player === "2") {
-                setPartsPlayerTwo((prev) => [...prev, 7]);
+                setPartsPlayerTwo((prev: any) => [...prev, 7]);
               }
             }
             if (data.type === "nextPlayer") {
@@ -296,7 +296,9 @@ export default function Home() {
         {partsPlayerOne.length > 1 &&
           partsPlayerOne
             .slice(0, 7)
-            .map((, index) => <BackgroundParts key={index} color="red" />)}
+            .map((item: any, index: any) => (
+              <BackgroundParts key={index} color="red" />
+            ))}
         {partsPlayerOne.length >= 8 && (
           <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
             + {partsPlayerOne.length - 7}
@@ -318,7 +320,7 @@ export default function Home() {
       {allParts && (
         <ScrollableDiv ref={scrollableDivRef} isScroll={allParts.length > 3}>
           {allParts &&
-            allParts.map((item, index) => (
+            allParts.map((item: any, index: any) => (
               <Parts
                 key={index}
                 numbers={item.data}
@@ -333,7 +335,9 @@ export default function Home() {
         {partsPlayerOne.length > 1 &&
           partsPlayerOne
             .slice(0, 7)
-            .map((, index) => <BackgroundParts key={index} color="orange" />)}
+            .map((item: any, index: any) => (
+              <BackgroundParts key={index} color="orange" />
+            ))}
         {partsPlayerOne.length >= 8 && (
           <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
             + {partsPlayerOne.length - 7}

@@ -109,7 +109,7 @@ export const ScrollableDiv = styled.div`
   scrollbar-gutter: stable both-edges;
 `;
 
-export const Table = styled.div`
+export const Table = styled.div<any>`
   position: absolute;
   background: #e3e0b3;
   height: 100px;

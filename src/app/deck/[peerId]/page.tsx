@@ -22,7 +22,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
   const [peerId, setPeerId] = useState("");
   const [pairs, setPairs] = useState<any>(null);
-  const [currentPart, setCurrentPart] = useState("");
+  const [currentPart, setCurrentPart] = useState<any>("");
   const [currentPlayer, setCurrentPlayer] = useState(false);
   const [isBuyPart, setIsBuyPart] = useState(false);
   const [isWinner, setIsWinner] = useState<number | string | null>(null);
@@ -111,7 +111,9 @@ export default function Home({ params }: { params: { peerId: string } }) {
           player: player,
         });
       }
-      setPairs((prevPairs) => prevPairs.filter((pair) => pair !== data));
+      setPairs((prevPairs: any) =>
+        prevPairs.filter((pair: any) => pair !== data)
+      );
       setCurrentPlayer(false);
     }
   };
@@ -158,7 +160,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
               }
               onClick={() => {
                 if (currentPlayer && !isBuyPart) {
-                  setPairs((prevParts) => [
+                  setPairs((prevParts: any) => [
                     ...prevParts,
                     [
                       Math.floor(Math.random() * 7).toString(),
@@ -200,7 +202,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
           </div>
         </div>
         <ContainerParts>
-          {pairs.map((item, index) => (
+          {pairs.map((item: any, index: any) => (
             <div key={index} onClick={() => handleSendPart(item)}>
               <Parts
                 numbers={item}

@@ -55,7 +55,7 @@ export const ContainerParts = styled.div`
   margin-top: 16px;
 `;
 
-export const ButtonGetPart = styled.div`
+export const ButtonGetPart = styled.div<any>`
   display: flex;
   align-items: center;
   justify-content: center;
