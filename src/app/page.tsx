@@ -294,7 +294,9 @@ export default function Home() {
     <ContainerGame>
       <div style={{ display: "flex", alignItems: "center" }}>
         {partsPlayerOne.length > 1 &&
-          partsPlayerOne.slice(0, 7).map(() => <BackgroundParts color="red" />)}
+          partsPlayerOne
+            .slice(0, 7)
+            .map((, index) => <BackgroundParts key={index} color="red" />)}
         {partsPlayerOne.length >= 8 && (
           <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
             + {partsPlayerOne.length - 7}
@@ -331,7 +333,7 @@ export default function Home() {
         {partsPlayerOne.length > 1 &&
           partsPlayerOne
             .slice(0, 7)
-            .map(() => <BackgroundParts color="orange" />)}
+            .map((, index) => <BackgroundParts key={index} color="orange" />)}
         {partsPlayerOne.length >= 8 && (
           <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
             + {partsPlayerOne.length - 7}
