@@ -81,7 +81,7 @@ export const ContainerGame = styled.div`
   background-image: radial-gradient(#4c6aae, #2e4068, #26375c);
 `;
 
-export const ScrollableDiv = styled.div`
+export const ScrollableDiv = styled.div<any>`
   width: 100%;
   height: 400px;
   overflow-x: auto;
