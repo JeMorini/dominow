@@ -150,7 +150,7 @@ export const Circle = styled.div`
   box-shadow: inset 5px 0 5px rgba(0, 0, 0, 0.5);
 `;
 
-export const ContainerNumber = styled.div<ContainerNumberProps>`
+export const ContainerNumber = styled.div<any>`
   /* flex: 1; */
   display: flex;
   align-items: center;

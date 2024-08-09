@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { Container, Logo, WinnerText } from "./styles";
+import { Container, WinnerText } from "./styles";
 import PlayerIcon from "../PlayerIcon";
 
 export default function WinnerMessage({ player, message }: any) {

@@ -4,7 +4,7 @@ interface ContainerNumberProps {
   justifyContent: "center" | "space-between";
 }
 
-export const Container = styled.div`
+export const Container = styled.div<any>`
   display: flex;
   align-items: center;
   justify-content: center;
