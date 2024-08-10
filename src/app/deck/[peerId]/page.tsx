@@ -202,18 +202,19 @@ export default function Home({ params }: { params: { peerId: string } }) {
           </div>
         </div>
         <ContainerParts>
-          {pairs.map((item: any, index: any) => (
-            <div key={index} onClick={() => handleSendPart(item)}>
-              <Parts
-                numbers={item}
-                playableColor={
-                  item.includes(currentPart) &&
-                  currentPlayer &&
-                  (player === "1" ? "red" : "orange")
-                }
-              />
-            </div>
-          ))}
+          {pairs &&
+            pairs.map((item: any, index: any) => (
+              <div key={index} onClick={() => handleSendPart(item)}>
+                <Parts
+                  numbers={item}
+                  playableColor={
+                    item.includes(currentPart) &&
+                    currentPlayer &&
+                    (player === "1" ? "red" : "orange")
+                  }
+                />
+              </div>
+            ))}
         </ContainerParts>
       </ContainerGame>
     )
