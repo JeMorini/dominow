@@ -24,6 +24,8 @@ import Parts from "@/components/Parts";
 import BackgroundParts from "@/components/BackgroundParts";
 import PlayerIcon from "@/components/PlayerIcon";
 import WinnerMessage from "@/components/WinnerMessage";
+import { Rings } from "react-loader-spinner";
+import { FaCheck } from "react-icons/fa";
 
 export default function Home() {
   const peerInstance = useRef<any>(null);
@@ -256,29 +258,63 @@ export default function Home() {
       <SubTitle>Conecte-se ao jogo</SubTitle>
       <ContainerQrCodeLine>
         <ContainerQrCode>
-          <TitlePlayer>Jogador 1</TitlePlayer>
-          <TitleStatus>
-            Status: {connectedPeerOne ? `Conectado` : `Desconectado`}
-          </TitleStatus>
-          <QRCodeSVG value={url + `?player=1`} />
-          <TitlePlayer>Ou</TitlePlayer>
-          <ButtonUrl onClick={() => copyToClipboard("1")}>
-            <FaCopy size={20} color="#fff" />
-            <TitleButtonUrl>Copiar URL</TitleButtonUrl>
-          </ButtonUrl>
+          {url ? (
+            <>
+              <TitlePlayer>Jogador 1</TitlePlayer>
+              <TitleStatus>
+                Status: {connectedPeerOne ? `Conectado` : `Desconectado`}
+              </TitleStatus>
+              {connectedPeerOne ? (
+                <FaCheck size={60} color="green" />
+              ) : (
+                <>
+                  <QRCodeSVG value={url + `?player=1`} />
+                  <TitlePlayer>Ou</TitlePlayer>
+                  <ButtonUrl onClick={() => copyToClipboard("1")}>
+                    <FaCopy size={20} color="#fff" />
+                    <TitleButtonUrl>Copiar URL</TitleButtonUrl>
+                  </ButtonUrl>
+                </>
+              )}
+            </>
+          ) : (
+            <Rings
+              visible={true}
+              height="80"
+              width="80"
+              color="#018780"
+              ariaLabel="rings-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          )}
         </ContainerQrCode>
         <TitleVs>Vs</TitleVs>
         <ContainerQrCode>
-          <TitlePlayer>Jogador 2</TitlePlayer>
-          <TitleStatus>
-            Status: {connectedPeerTwo ? `Conectado` : `Desconectado`}
-          </TitleStatus>
-          <QRCodeSVG value={url + `?player=2`} />
-          <TitlePlayer>Ou</TitlePlayer>
-          <ButtonUrl onClick={() => copyToClipboard("2")}>
-            <FaCopy size={20} color="#fff" />
-            <TitleButtonUrl>Copiar URL</TitleButtonUrl>
-          </ButtonUrl>
+          {url ? (
+            <>
+              <TitlePlayer>Jogador 2</TitlePlayer>
+              <TitleStatus>
+                Status: {connectedPeerTwo ? `Conectado` : `Desconectado`}
+              </TitleStatus>
+              <QRCodeSVG value={url + `?player=2`} />
+              <TitlePlayer>Ou</TitlePlayer>
+              <ButtonUrl onClick={() => copyToClipboard("2")}>
+                <FaCopy size={20} color="#fff" />
+                <TitleButtonUrl>Copiar URL</TitleButtonUrl>
+              </ButtonUrl>
+            </>
+          ) : (
+            <Rings
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              ariaLabel="rings-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          )}
         </ContainerQrCode>
       </ContainerQrCodeLine>
     </Container>

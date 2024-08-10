@@ -21,6 +21,9 @@ export const ButtonConnect = styled.div`
   padding: 16px;
   border-radius: 8px;
   cursor: pointer;
+  &:hover {
+    background: #026963;
+  }
 `;
 
 export const TitleButtonConnect = styled.div`

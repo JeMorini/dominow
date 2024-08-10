@@ -28,6 +28,8 @@ export const ContainerQrCode = styled.div`
   background: white;
   border-radius: 8px;
   padding: 32px 48px;
+  height: 400px;
+  width: 200px;
 `;
 
 export const TitlePlayer = styled.p`
@@ -60,6 +62,9 @@ export const ButtonUrl = styled.div`
   padding: 16px;
   border-radius: 8px;
   cursor: pointer;
+  &:hover {
+    background: #026963;
+  }
 `;
 
 export const TitleButtonUrl = styled.div`

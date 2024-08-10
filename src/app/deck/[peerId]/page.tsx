@@ -17,6 +17,7 @@ import { GiDominoTiles } from "react-icons/gi";
 import { ImNext2 } from "react-icons/im";
 import PlayerIcon from "@/components/PlayerIcon";
 import WinnerMessage from "@/components/WinnerMessage";
+import { Rings } from "react-loader-spinner";
 
 export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -26,6 +27,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [currentPlayer, setCurrentPlayer] = useState(false);
   const [isBuyPart, setIsBuyPart] = useState(false);
   const [isWinner, setIsWinner] = useState<number | string | null>(null);
+  const [isAwaiting, setIsAwaiting] = useState<boolean>(false);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
@@ -221,18 +223,54 @@ export default function Home({ params }: { params: { peerId: string } }) {
   ) : (
     <ContainerConnect>
       <img src="/logo_white.png" />
-      <ButtonConnect
-        onClick={() =>
-          sendMessageToPeer({
-            type: "connection",
-            peerId: peerId,
-            player: player,
-          })
-        }
-      >
-        <PiPlugsConnectedFill size={20} color="#fff" />
-        <TitleButtonConnect>Conectar</TitleButtonConnect>
-      </ButtonConnect>
+      {peerInstance.current ? (
+        isAwaiting ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Rings
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              ariaLabel="rings-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+            <p style={{ fontSize: 20, color: "#fff" }}>
+              Aguardando jogador {player === "1" ? "2" : "1"}
+            </p>
+          </div>
+        ) : (
+          <ButtonConnect
+            onClick={() => {
+              sendMessageToPeer({
+                type: "connection",
+                peerId: peerId,
+                player: player,
+              });
+              setIsAwaiting(true);
+            }}
+          >
+            <PiPlugsConnectedFill size={20} color="#fff" />
+            <TitleButtonConnect>Conectar</TitleButtonConnect>
+          </ButtonConnect>
+        )
+      ) : (
+        <Rings
+          visible={true}
+          height="80"
+          width="80"
+          color="#018780"
+          ariaLabel="rings-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      )}
     </ContainerConnect>
   );
 }
