@@ -297,12 +297,18 @@ export default function Home() {
               <TitleStatus>
                 Status: {connectedPeerTwo ? `Conectado` : `Desconectado`}
               </TitleStatus>
-              <QRCodeSVG value={url + `?player=2`} />
-              <TitlePlayer>Ou</TitlePlayer>
-              <ButtonUrl onClick={() => copyToClipboard("2")}>
-                <FaCopy size={20} color="#fff" />
-                <TitleButtonUrl>Copiar URL</TitleButtonUrl>
-              </ButtonUrl>
+              {connectedPeerTwo ? (
+                <FaCheck size={60} color="green" />
+              ) : (
+                <>
+                  <QRCodeSVG value={url + `?player=2`} />
+                  <TitlePlayer>Ou</TitlePlayer>
+                  <ButtonUrl onClick={() => copyToClipboard("2")}>
+                    <FaCopy size={20} color="#fff" />
+                    <TitleButtonUrl>Copiar URL</TitleButtonUrl>
+                  </ButtonUrl>
+                </>
+              )}
             </>
           ) : (
             <Rings
@@ -368,15 +374,15 @@ export default function Home() {
       )}
       {/* </div> */}
       <div style={{ display: "flex", alignItems: "center" }}>
-        {partsPlayerOne.length > 1 &&
-          partsPlayerOne
+        {partsPlayerTwo.length > 1 &&
+          partsPlayerTwo
             .slice(0, 7)
             .map((item: any, index: any) => (
               <BackgroundParts key={index} color="orange" />
             ))}
-        {partsPlayerOne.length >= 8 && (
+        {partsPlayerTwo.length >= 8 && (
           <TextPlus style={{ fontSize: 32, zIndex: 100 }}>
-            + {partsPlayerOne.length - 7}
+            + {partsPlayerTwo.length - 7}
           </TextPlus>
         )}
       </div>
