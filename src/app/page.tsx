@@ -388,7 +388,7 @@ export default function Home() {
   ) : (
     <ContainerGame>
       <div style={{ display: "flex", alignItems: "center" }}>
-        {partsPlayerOne.length > 1 &&
+        {partsPlayerOne.length >= 1 &&
           partsPlayerOne
             .slice(0, 7)
             .map((item: any, index: any) => (
@@ -427,7 +427,7 @@ export default function Home() {
       )}
       {/* </div> */}
       <div style={{ display: "flex", alignItems: "center" }}>
-        {partsPlayerTwo.length > 1 &&
+        {partsPlayerTwo.length >= 1 &&
           partsPlayerTwo
             .slice(0, 7)
             .map((item: any, index: any) => (
