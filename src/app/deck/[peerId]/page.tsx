@@ -15,9 +15,11 @@ import { PiPlugsConnectedFill } from "react-icons/pi";
 import Parts from "@/components/Parts";
 import { GiDominoTiles } from "react-icons/gi";
 import { ImNext2 } from "react-icons/im";
-import PlayerIcon from "@/components/PlayerIcon";
 import WinnerMessage from "@/components/WinnerMessage";
 import { Rings } from "react-loader-spinner";
+import useScreenOrientation from "@/hooks/useScreenOrientation";
+import ValidateScreen from "@/components/ValidateScreen";
+import useWindowSize from "@/hooks/useWindowSize";
 
 export default function Home({ params }: { params: { peerId: string } }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -30,11 +32,13 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [isAwaiting, setIsAwaiting] = useState<boolean>(false);
   const [connection, setConnection] = useState<any>(false);
   const peerInstance = useRef<any>(null);
+  const { width } = useWindowSize();
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const player = searchParams.get("player");
+  const orientation = useScreenOrientation();
 
   useEffect(() => {
     if (player === "1") {
@@ -128,7 +132,12 @@ export default function Home({ params }: { params: { peerId: string } }) {
     }
   }, [pairs, isConnected]);
 
-  return isConnected ? (
+  return width > 1000 ? (
+    <ValidateScreen message="Utilize o celular para jogar!" />
+  ) : orientation === "portrait-primary" ||
+    orientation === "portrait-secondary" ? (
+    <ValidateScreen message="Gire o celular para jogar" />
+  ) : isConnected ? (
     isWinner ? (
       <ContainerGame>
         <WinnerMessage

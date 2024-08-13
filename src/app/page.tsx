@@ -26,6 +26,8 @@ import PlayerIcon from "@/components/PlayerIcon";
 import WinnerMessage from "@/components/WinnerMessage";
 import { Rings } from "react-loader-spinner";
 import { FaCheck } from "react-icons/fa";
+import ValidateScreen from "@/components/ValidateScreen";
+import useWindowSize from "@/hooks/useWindowSize";
 
 export default function Home() {
   const peerInstance = useRef<any>(null);
@@ -43,6 +45,7 @@ export default function Home() {
   const [isWinner, setIsWinner] = useState<string | null>();
   const [connectionOne, setConnectionOne] = useState<any>();
   const [connectionTwo, setConnectionTwo] = useState<any>();
+  const { width, height } = useWindowSize();
 
   const getFirstPart = useCallback(() => {
     if (currentNumber) {
@@ -305,7 +308,9 @@ export default function Home() {
     navigator.clipboard.writeText(url + `?player=${player}`);
   };
 
-  return !connectedPeerOne || !connectedPeerTwo ? (
+  return width && width < 1500 ? (
+    <ValidateScreen />
+  ) : !connectedPeerOne || !connectedPeerTwo ? (
     <Container>
       <img src="/logo_white.png" />
       <SubTitle>Conecte-se ao jogo</SubTitle>
@@ -411,7 +416,6 @@ export default function Home() {
         src="/logo_white.png"
         style={{ position: "absolute", left: 8, top: 8 }}
       />
-      {/* <div style={{ display: "flex" }}> */}
       {allParts && (
         <ScrollableDiv ref={scrollableDivRef} isScroll={allParts.length > 3}>
           {allParts &&
@@ -425,7 +429,6 @@ export default function Home() {
             ))}
         </ScrollableDiv>
       )}
-      {/* </div> */}
       <div style={{ display: "flex", alignItems: "center" }}>
         {partsPlayerTwo.length >= 1 &&
           partsPlayerTwo
@@ -440,7 +443,6 @@ export default function Home() {
         )}
       </div>
       <Table bottom isSelected={currentPlayer === 2}>
-        {/* <h1 >Jogador 2</h1> */}
         <PlayerIcon color="orange" player="2" />
 
         <div style={{ marginLeft: 16 }}>
