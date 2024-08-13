@@ -39,8 +39,10 @@ export default function Home() {
   const [partsPlayerTwo, setPartsPlayerTwo] = useState<any>(0);
   const [currentNumber, setCurrentNumber] = useState<string | null>("");
   const [currentPlayer, setCurrentPlayer] = useState(1);
-  const [allParts, setAllParts] = useState<any>();
+  const [allParts, setAllParts] = useState<any>(null);
   const [isWinner, setIsWinner] = useState<string | null>();
+  const [connectionOne, setConnectionOne] = useState<any>();
+  const [connectionTwo, setConnectionTwo] = useState<any>();
 
   const getFirstPart = useCallback(() => {
     if (currentNumber) {
@@ -57,116 +59,163 @@ export default function Home() {
     const myPeer = new Peer();
 
     myPeer.on("open", (id) => {
-      console.log("My peer ID:", id);
       setPeerId(id);
       setUrl(`${process.env.NEXT_PUBLIC_URL}/deck/${id}`);
     });
 
     myPeer.on("connection", (connection) => {
-      console.log("Connection established with:", connection.peer);
-
       connection.on("data", (data: any) => {
-        const conn = myPeer.connect(`${data.peerId}`);
-
-        conn.on("open", () => {
-          if (data.type === "connection") {
-            if (data.player === "1") {
-              setConnectedPeerOne(data);
-            }
-
-            if (data.player === "2") {
-              setConnectedPeerTwo(data);
-            }
+        if (data.type === "connection") {
+          if (data.player === "1") {
+            setConnectionOne(connection);
+            setConnectedPeerOne(data);
           }
-        });
+
+          if (data.player === "2") {
+            setConnectionTwo(connection);
+            setConnectedPeerTwo(data);
+          }
+        }
       });
     });
 
     setConnectionFinished(true);
 
     peerInstance.current = myPeer;
-
-    return () => myPeer.destroy();
-  }, []);
+  }, [allParts]);
 
   useEffect(() => {
-    if (connectedPeerOne && connectedPeerTwo && connectionFinished) {
-      peerInstance.current.on("connection", (connection: any) => {
-        console.log("Connection established with:", connection.peer);
-
-        connection.on("data", (data: any) => {
-          const conn = peerInstance.current.connect(`${data.peerId}`);
-
-          conn.on("open", () => {
-            if (data.type === "sendPart") {
-              setCurrentNumber(data.newNumber);
-              setAllParts((prevParts: any) => [...prevParts, data.newPart]);
-              if (data.player === "1") {
-                setPartsPlayerOne((prev: any) => prev.slice(0, -1));
-                sendMessageToPeer({
-                  peerId: connectedPeerTwo?.peerId,
-                  data: {
-                    type: "changeCurrentPlayer",
-                    data: data.newNumber,
-                  },
-                });
-                setCurrentPlayer(2);
-              }
-              if (data.player === "2") {
-                setPartsPlayerTwo((prev: any) => prev.slice(0, -1));
-                sendMessageToPeer({
-                  peerId: connectedPeerOne?.peerId,
-                  data: {
-                    type: "changeCurrentPlayer",
-                    data: data.newNumber,
-                  },
-                });
-                setCurrentPlayer(1);
-              }
-              if (scrollableDivRef.current) {
-                setTimeout(() => {
-                  scrollableDivRef.current.scrollTo({
-                    left: scrollableDivRef.current.scrollWidth,
-                    behavior: "smooth",
-                  });
-                }, 1000);
-              }
-            }
-            if (data.type === "buyPart") {
-              if (data.player === "1") {
-                setPartsPlayerOne((prev: any) => [...prev, 7]);
-              }
-              if (data.player === "2") {
-                setPartsPlayerTwo((prev: any) => [...prev, 7]);
-              }
-            }
-            if (data.type === "nextPlayer") {
-              if (data.player === "1") {
-                sendMessageToPeer({
-                  peerId: connectedPeerTwo?.peerId,
-                  data: {
-                    type: "changeCurrentPlayer",
-                  },
-                });
-                setCurrentPlayer(2);
-              }
-              if (data.player === "2") {
-                sendMessageToPeer({
-                  peerId: connectedPeerOne?.peerId,
-                  data: {
-                    type: "changeCurrentPlayer",
-                  },
-                });
-                setCurrentPlayer(1);
-              }
-            }
-          });
-        });
+    if (connectionOne && connectedPeerTwo) {
+      connectionOne.on("data", (data: any) => {
+        if (data.type === "sendPart") {
+          setCurrentNumber(data.newNumber);
+          setAllParts((prevParts: any) => [...prevParts, data.newPart]);
+        }
+        if (data.type === "sendPart") {
+          if (data.player === "1") {
+            setPartsPlayerOne((prev: any) => prev.slice(0, -1));
+            sendMessageToPeer({
+              peerId: connectedPeerTwo?.peerId,
+              data: {
+                type: "changeCurrentPlayer",
+                data: data.newNumber,
+              },
+            });
+            setCurrentPlayer(2);
+          }
+          if (scrollableDivRef.current) {
+            setTimeout(() => {
+              scrollableDivRef.current.scrollTo({
+                left: scrollableDivRef.current.scrollWidth,
+                behavior: "smooth",
+              });
+            }, 1000);
+          }
+        }
+        if (data.type === "buyPart") {
+          if (data.player === "1") {
+            setPartsPlayerOne((prev: any) => [...prev, 7]);
+          }
+        }
+        if (data.type === "nextPlayer") {
+          if (data.player === "1") {
+            sendMessageToPeer({
+              peerId: connectedPeerTwo?.peerId,
+              data: {
+                type: "changeCurrentPlayer",
+              },
+            });
+            setCurrentPlayer(2);
+          }
+        }
+        // });
       });
-
-      return () => peerInstance.current.destroy();
+      // });
     }
-  }, [connectedPeerOne, connectedPeerTwo, peerInstance, connectionFinished]);
+  }, [
+    connectedPeerOne,
+    connectedPeerTwo,
+    peerInstance,
+    connectionFinished,
+    connectionOne,
+    connectionTwo,
+  ]);
+
+  useEffect(() => {
+    if (connectionTwo && connectionOne) {
+      connectionTwo.on("data", (data: any) => {
+        if (data.type === "sendPart") {
+          setCurrentNumber(data.newNumber);
+          setAllParts((prevParts: any) => [...prevParts, data.newPart]);
+          if (data.player === "1") {
+            setPartsPlayerOne((prev: any) => prev.slice(0, -1));
+            sendMessageToPeer({
+              peerId: connectedPeerTwo?.peerId,
+              data: {
+                type: "changeCurrentPlayer",
+                data: data.newNumber,
+              },
+            });
+            setCurrentPlayer(2);
+          }
+          if (data.player === "2") {
+            setPartsPlayerTwo((prev: any) => prev.slice(0, -1));
+            sendMessageToPeer({
+              peerId: connectedPeerOne?.peerId,
+              data: {
+                type: "changeCurrentPlayer",
+                data: data.newNumber,
+              },
+            });
+            setCurrentPlayer(1);
+          }
+          if (scrollableDivRef.current) {
+            setTimeout(() => {
+              scrollableDivRef.current.scrollTo({
+                left: scrollableDivRef.current.scrollWidth,
+                behavior: "smooth",
+              });
+            }, 1000);
+          }
+        }
+        if (data.type === "buyPart") {
+          if (data.player === "1") {
+            setPartsPlayerOne((prev: any) => [...prev, 7]);
+          }
+          if (data.player === "2") {
+            setPartsPlayerTwo((prev: any) => [...prev, 7]);
+          }
+        }
+        if (data.type === "nextPlayer") {
+          if (data.player === "1") {
+            sendMessageToPeer({
+              peerId: connectedPeerTwo?.peerId,
+              data: {
+                type: "changeCurrentPlayer",
+              },
+            });
+            setCurrentPlayer(2);
+          }
+          if (data.player === "2") {
+            sendMessageToPeer({
+              peerId: connectedPeerOne?.peerId,
+              data: {
+                type: "changeCurrentPlayer",
+              },
+            });
+            setCurrentPlayer(1);
+          }
+        }
+      });
+    }
+  }, [
+    connectedPeerOne,
+    connectedPeerTwo,
+    peerInstance,
+    connectionFinished,
+    connectionTwo,
+    connectionOne,
+  ]);
 
   useEffect(() => {
     if (
@@ -210,11 +259,15 @@ export default function Home() {
   ]);
 
   const sendMessageToPeer = ({ peerId, data }: any) => {
-    const conn = peerInstance.current.connect(peerId);
+    let conn;
+    if (peerId === connectedPeerOne.peerId) {
+      conn = connectionOne;
+    }
+    if (peerId === connectedPeerTwo.peerId) {
+      conn = connectionTwo;
+    }
 
-    conn.on("open", () => {
-      conn.send(data);
-    });
+    conn.send(data);
   };
 
   useEffect(() => {

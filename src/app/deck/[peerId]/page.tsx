@@ -28,6 +28,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
   const [isBuyPart, setIsBuyPart] = useState(false);
   const [isWinner, setIsWinner] = useState<number | string | null>(null);
   const [isAwaiting, setIsAwaiting] = useState<boolean>(false);
+  const [connection, setConnection] = useState<any>(false);
   const peerInstance = useRef<any>(null);
 
   const router = useRouter();
@@ -45,15 +46,15 @@ export default function Home({ params }: { params: { peerId: string } }) {
     const myPeer = new Peer();
 
     myPeer.on("open", (id) => {
-      console.log("My peer ID:", id);
       setPeerId(id);
     });
 
-    myPeer.on("connection", (connection) => {
-      console.log("Connection established with:", connection.peer);
+    peerInstance.current = myPeer;
+  }, [router, params]);
 
+  useEffect(() => {
+    if (connection) {
       connection.on("data", (data: any) => {
-        console.log("Received message:", data);
         switch (data.type) {
           case "parts":
             setPairs(data.data);
@@ -76,15 +77,16 @@ export default function Home({ params }: { params: { peerId: string } }) {
         }
         setIsConnected(true);
       });
-    });
-
-    peerInstance.current = myPeer;
-
-    return () => myPeer.destroy();
-  }, [router, params]);
+    }
+  }, [connection]);
 
   const sendMessageToPeer = (data: any) => {
-    const conn = peerInstance.current.connect(params.peerId);
+    connection.send(data);
+  };
+
+  const handleConnectToPeer = (data: any) => {
+    let conn = peerInstance.current.connect(params.peerId);
+    setConnection(conn);
 
     conn.on("open", () => {
       conn.send(data);
@@ -248,7 +250,7 @@ export default function Home({ params }: { params: { peerId: string } }) {
         ) : (
           <ButtonConnect
             onClick={() => {
-              sendMessageToPeer({
+              handleConnectToPeer({
                 type: "connection",
                 peerId: peerId,
                 player: player,
